@@ -3,6 +3,10 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+/**
+ * 회원가입 폼 컴포넌트
+ * TAG-TASK-009: 회원가입 폼 컴포넌트 구현
+ */
 export default function SignUpForm() {
   const router = useRouter()
   const [formData, setFormData] = useState({

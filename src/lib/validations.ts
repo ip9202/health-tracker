@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
 /**
+ * Zod 스키마 유효성 검증
+ * TAG-TASK-003: Zod 스키마 유효성 검증 구현
+ */
+
+/**
  * 회원가입 입력 타입
  */
 export type SignUpInput = z.infer<typeof signUpSchema>

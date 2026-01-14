@@ -6,6 +6,10 @@ import { verifyPassword } from '@/lib/password'
 import { signInSchema } from './validations'
 import type { User } from '@prisma/client'
 
+/**
+ * NextAuth.js 설정
+ * TAG-TASK-005: NextAuth.js 설정 및 Credentials Provider 구현
+ */
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
@@ -43,8 +47,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return null
           }
 
-          // 3. 비밀번호 검증
-          const isPasswordValid = verifyPassword(password, user.password)
+          // 3. 비밀번호 검증 (비동기)
+          const isPasswordValid = await verifyPassword(password, user.password)
 
           if (!isPasswordValid) {
             return null

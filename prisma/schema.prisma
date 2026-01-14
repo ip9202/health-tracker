@@ -21,6 +21,7 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  inbodyRecords InBodyRecord[]
 }
 
 // Account 모델 - OAuth 제공자 연동 (NextAuth.js)
@@ -59,4 +60,61 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// TAG-DATA-TASK-001: InBodyRecord 모델 정의 및 데이터베이스 마이그레이션
+// SPEC-DATA-004: 데이터베이스 저장
+model InBodyRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  measuredAt        DateTime // 측정 일시
+
+  // 개인정보
+  name              String?
+  gender            String?
+  age               Int?
+  height            Float?
+
+  // 체성분 데이터
+  weight            Float?
+  bodyFatPercentage Float?
+  muscle            Float?
+  protein           Float?
+  bodyWater         Float?
+  skeletalMuscle    Float?
+
+  // 신체 점수
+  bodyScore         Int?
+  scoreDescription  String?
+
+  // 비만 판정
+  bmi               Float?
+  bmiStatus         String?
+
+  // 체중 조절
+  weightControl     String?
+
+  // 신체 유형
+  bodyType          String?
+
+  // 생체 임피던스
+  bioimpedance      String?
+
+  // 기타 지표
+  smi               Float?
+  calorieNeeds      Int?
+
+  // 부위별 분석 (JSON 형식 저장)
+  regionalAnalysis  String?
+
+  // OCR 메타데이터
+  ocrConfidence     Float?
+  ocrProcessedAt    DateTime @default(now())
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt])
 }

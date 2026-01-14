@@ -13,6 +13,7 @@ const getPrismaClient = () => {
 /**
  * POST /api/auth/signup
  * 회원가입 API 엔드포인트
+ * TAG-TASK-004: 회원가입 API 엔드포인트 구현
  */
 export async function POST(request: NextRequest) {
   const prisma = getPrismaClient()
@@ -52,8 +53,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 비밀번호 해싱
-    const hashedPassword = hashPassword(password)
+    // 비밀번호 해싱 (비동기)
+    const hashedPassword = await hashPassword(password)
 
     // 사용자 생성
     const newUser = await prisma.user.create({

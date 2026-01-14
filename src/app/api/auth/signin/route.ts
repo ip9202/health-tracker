@@ -3,6 +3,11 @@ import { signInSchema } from '@/lib/validations'
 import { prisma } from '@/lib/prisma'
 import { verifyPassword } from '@/lib/password'
 
+/**
+ * POST /api/auth/signin
+ * 사용자 로그인 API 엔드포인트
+ * TAG-TASK-006: 로그인 API 엔드포인트 구현
+ */
 export async function POST(request: NextRequest) {
   try {
     // 1. 요청 본문 파싱
@@ -38,8 +43,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 4. 비밀번호 검증
-    const isPasswordValid = verifyPassword(password, user.password)
+    // 4. 비밀번호 검증 (비동기)
+    const isPasswordValid = await verifyPassword(password, user.password)
 
     if (!isPasswordValid) {
       return NextResponse.json(

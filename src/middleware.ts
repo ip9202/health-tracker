@@ -5,6 +5,7 @@ import { auth } from '@/lib/auth'
 /**
  * NextAuth.js 미들웨어
  * 인증이 필요한 라우트를 보호하고, 인증되지 않은 사용자를 로그인 페이지로 리다이렉트합니다.
+ * TAG-TASK-008: 인증이 필요한 라우트 보호 미들웨어 구현
  */
 export default auth((req) => {
   const { pathname } = req.nextUrl
