@@ -1,16 +1,19 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { POST } from '@/app/api/inbody/upload/route';
 import { prisma } from '@/lib/prisma';
+import { NextRequest } from 'next/server';
 
 // Mock dependencies
+const mockImageValidationError = {
+  UNSUPPORTED_FORMAT: 'UNSUPPORTED_FORMAT',
+  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  INVALID_MAGIC_BYTES: 'INVALID_MAGIC_BYTES',
+  EMPTY_FILE: 'EMPTY_FILE',
+} as const;
+
 vi.mock('@/lib/image-validator', () => ({
   validateImageFile: vi.fn(),
-  ImageValidationError: {
-    UNSUPPORTED_FORMAT: 'UNSUPPORTED_FORMAT',
-    FILE_TOO_LARGE: 'FILE_TOO_LARGE',
-    INVALID_MAGIC_BYTES: 'INVALID_MAGIC_BYTES',
-    EMPTY_FILE: 'EMPTY_FILE',
-  },
+  ImageValidationError: mockImageValidationError,
 }));
 
 vi.mock('@/lib/ocr-service', () => ({
@@ -107,9 +110,9 @@ describe('POST /api/inbody/upload', () => {
 
     vi.mocked(validateImageFile).mockResolvedValue({
       valid: false,
-      error: 'UNSUPPORTED_FORMAT' as const,
+      error: mockImageValidationError.UNSUPPORTED_FORMAT,
       errorDetails: '지원되지 않는 형식입니다',
-    });
+    } as any);
 
     const mockRequest = {
       formData: async () => mockFormData,

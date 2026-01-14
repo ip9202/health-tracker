@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { POST } from '@/app/api/auth/signup/route'
+import type { NextRequest } from 'next/server'
 
 // Mock password utility
 vi.mock('@/lib/password', () => ({
-  hashPassword: vi.fn((password: string) => `hashed_${password}`)
+  hashPassword: vi.fn((password: string) => Promise.resolve(`hashed_${password}`))
 }))
 
 // Mock Prisma module
@@ -47,7 +48,7 @@ describe('POST /api/auth/signup - TASK-004', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -71,7 +72,7 @@ describe('POST /api/auth/signup - TASK-004', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -93,7 +94,7 @@ describe('POST /api/auth/signup - TASK-004', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -120,7 +121,7 @@ describe('POST /api/auth/signup - TASK-004', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -148,7 +149,7 @@ describe('POST /api/auth/signup - TASK-004', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     await POST(request)
 
@@ -173,7 +174,7 @@ describe('POST /api/auth/signup - TASK-004', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -189,7 +190,7 @@ describe('POST /api/auth/signup - TASK-004', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()

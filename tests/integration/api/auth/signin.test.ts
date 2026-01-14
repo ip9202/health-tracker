@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import type { NextRequest } from 'next/server'
+import type { MockedFunction } from 'vitest'
 
 // Mock modules before imports
 vi.mock('@/lib/password', () => ({
@@ -18,8 +20,8 @@ import { verifyPassword } from '@/lib/password'
 import { prisma } from '@/lib/prisma'
 
 // Type assertion for mocked functions
-const mockedVerifyPassword = verifyPassword as vi.MockedFunction<typeof verifyPassword>
-const mockedFindUnique = prisma.user.findUnique as unknown as vi.MockedFunction<typeof prisma.user.findUnique>
+const mockedVerifyPassword = verifyPassword as MockedFunction<typeof verifyPassword>
+const mockedFindUnique = prisma.user.findUnique as unknown as MockedFunction<typeof prisma.user.findUnique>
 
 describe('POST /api/auth/signin - TASK-006', () => {
   beforeEach(() => {
@@ -45,7 +47,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
     })
 
     // Mock password verification success
-    mockedVerifyPassword.mockReturnValue(true)
+    mockedVerifyPassword.mockResolvedValue(true)
 
     const request = new Request('http://localhost:3000/api/auth/signin', {
       method: 'POST',
@@ -53,7 +55,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -80,7 +82,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -109,7 +111,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
     })
 
     // Mock password verification failure
-    mockedVerifyPassword.mockReturnValue(false)
+    mockedVerifyPassword.mockResolvedValue(false)
 
     const request = new Request('http://localhost:3000/api/auth/signin', {
       method: 'POST',
@@ -117,7 +119,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -139,7 +141,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -161,7 +163,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -177,7 +179,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()
@@ -201,7 +203,7 @@ describe('POST /api/auth/signin - TASK-006', () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    }) as unknown as NextRequest
 
     const response = await POST(request)
     const data = await response.json()

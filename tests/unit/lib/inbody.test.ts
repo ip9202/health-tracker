@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateInBodyData, InBodyDataSchema } from '@/lib/inbody';
+import { validateInBodyData, InBodyDataSchema, InBodyData } from '@/lib/inbody';
 
 describe('InBody Zod Schema', () => {
   describe('유효한 데이터 검증', () => {
