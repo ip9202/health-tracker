@@ -7,6 +7,12 @@
 ## [Unreleased]
 
 ### 추가 (Added)
+- SPEC-AI-001: AI 기반 건강 분석 및 추천 시스템 (진행 중)
+  - Zod 응답 검증 스키마 구현 (TAG-AI-004)
+  - RiskFactorSchema: 위험 요소 카테고리 및 레벨 검증
+  - RecommendationSchema: 운동/영양/생활 습관 추천 검증
+  - WarningSchema: 주의 사항 심각도 및 액션 가능성 검증
+  - HealthAnalysisSchema: 통합 건강 분석 결과 검증
 - SPEC-FE-004: InBody 데이터 관리 대시보드 기능
   - 드래그 앤 드롭 이미지 업로드 UI
   - 파일 형식 검증 (JPG/PNG)

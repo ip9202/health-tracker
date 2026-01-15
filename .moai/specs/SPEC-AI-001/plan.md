@@ -14,31 +14,41 @@
 
 **목표:** AI 통합을 위한 기반 인프라 구축
 
+**상태:** 🟡 진행 중 (Zod 스키마 완료, 나머지 예정)
+
 **작업 항목:**
 
-1. **의존성 설치**
+1. **의존성 설치** ⏸️ 예정
    - `@anthropic-ai/sdk` 최신 버전 설치
    - Zod 스키마 검증 라이브러리 설치 (이미 존재 확인)
 
-2. **데이터베이스 스키마 확장**
+2. **데이터베이스 스키마 확장** ⏸️ 예정
    - `HealthAnalysis` Prisma 모델 정의
    - `InBodyRecord`와의 관계 설정 (1:1)
    - 마이그레이션 생성 및 실행
 
-3. **환경 변수 설정**
+3. **환경 변수 설정** ⏸️ 예정
    - GLM API Base URL 설정
    - API 키 설정 (.env.local)
    - 타임아웃 및 재시도 설정
 
+4. **Zod 스키마 정의** ✅ 완료
+   - `RiskFactorSchema` 정의
+   - `RecommendationSchema` 정의
+   - `WarningSchema` 정의
+   - `HealthAnalysisSchema` 통합 스키마
+
 **산출물:**
-- `prisma/schema.prisma` (수정)
-- `.env.local` (환경 변수 추가)
-- 마이그레이션 파일
+- `src/lib/ai-schemas.ts` ✅ 완료 (74줄)
+- `prisma/schema.prisma` (수정) ⏸️ 예정
+- `.env.local` (환경 변수 추가) ⏸️ 예정
+- 마이그레이션 파일 ⏸️ 예정
 
 **완료 기준:**
-- Prisma 마이그레이션 성공
-- 환경 변수 설정 완료
-- 의존성 설치 완료
+- ✅ Zod 스키마 정의 완료
+- ⏸️ Prisma 마이그레이션 성공
+- ⏸️ 환경 변수 설정 완료
+- ⏸️ 의존성 설치 완료
 
 ---
 
@@ -46,39 +56,41 @@
 
 **목표:** GLM API 연동 및 핵심 비즈니스 로직 구현
 
+**상태:** ⏸️ 예정 (Phase 1 완료 후 시작)
+
 **작업 항목:**
 
-1. **Zod 스키마 정의**
+1. **Zod 스키마 정의** ✅ Phase 1에서 완료
    - `RiskFactorSchema` 정의
    - `RecommendationSchema` 정의
    - `WarningSchema` 정의
    - `HealthAnalysisSchema` 통합 스키마
 
-2. **AI 서비스 모듈 구현**
+2. **AI 서비스 모듈 구현** ⏸️ 예정
    - `src/lib/ai-service.ts` 생성
    - GLM API 클라이언트 초기화
    - 분석 요청 함수 구현
    - 재시도 로직 구현 (3회, 1초 지연)
    - 타임아웃 처리 (30초)
 
-3. **프롬프트 엔지니어링**
+3. **프롬프트 엔지니어링** ⏸️ 예정
    - 시스템 프롬프트 템플릿 작성
    - 사용자 데이터 포맷팅 함수
    - 추이 데이터 포함 로직
 
-4. **캐싱 로직**
+4. **캐싱 로직** ⏸️ 예정
    - 기존 분석 결과 확인
    - 재분석 트리거 조건 구현
 
 **산출물:**
-- `src/lib/ai-schemas.ts`
-- `src/lib/ai-service.ts`
-- `src/lib/prompts/health-analysis.ts`
+- `src/lib/ai-schemas.ts` ✅ 완료
+- `src/lib/ai-service.ts` ⏸️ 예정
+- `src/lib/prompts/health-analysis.ts` ⏸️ 예정
 
 **완료 기준:**
-- 단위 테스트 통과
-- Zod 검증 정상 작동
-- 재시도 로직 검증
+- ⏸️ 단위 테스트 통과
+- ✅ Zod 검증 정상 작동
+- ⏸️ 재시도 로직 검증
 
 ---
 
@@ -86,37 +98,39 @@
 
 **목표:** AI 분석 기능을 위한 RESTful API 구현
 
+**상태:** ⏸️ 예정 (Phase 2 완료 후 시작)
+
 **작업 항목:**
 
-1. **POST /api/inbody/confirm**
+1. **POST /api/inbody/confirm** ⏸️ 예정
    - InBody 데이터 저장 로직 수정
    - 백그라운드에서 AI 분석 트리거
    - 비동기 처리 구현
 
-2. **POST /api/health/analyze/[recordId]**
+2. **POST /api/health/analyze/[recordId]** ⏸️ 예정
    - 인증 미들웨어 적용
    - 분석 요청 처리
    - 진행 상태 반환
 
-3. **GET /api/health/analysis/[recordId]**
+3. **GET /api/health/analysis/[recordId]** ⏸️ 예정
    - 인증 미들웨어 적용
    - 분석 결과 조회
    - 캐싱 로직 적용
 
-4. **에러 핸들링**
+4. **에러 핸들링** ⏸️ 예정
    - API 호출 실패 처리
    - 타임아웃 처리
    - 검증 실패 처리
 
 **산출물:**
-- `src/app/api/inbody/confirm/route.ts`
-- `src/app/api/health/analyze/[recordId]/route.ts`
-- `src/app/api/health/analysis/[recordId]/route.ts`
+- `src/app/api/inbody/confirm/route.ts` ⏸️ 예정
+- `src/app/api/health/analyze/[recordId]/route.ts` ⏸️ 예정
+- `src/app/api/health/analysis/[recordId]/route.ts` ⏸️ 예정
 
 **완료 기준:**
-- API 통합 테스트 통과
-- 인증 검증 완료
-- 에러 핸들링 검증
+- ⏸️ API 통합 테스트 통과
+- ⏸️ 인증 검증 완료
+- ⏸️ 에러 핸들링 검증
 
 ---
 
@@ -124,35 +138,37 @@
 
 **목표:** AI 분석 결과 시각화 및 사용자 인터랙션
 
+**상태:** ⏸️ 예정 (Phase 3 완료 후 시작)
+
 **작업 항목:**
 
-1. **AI 분석 결과 컴포넌트**
+1. **AI 분석 결과 컴포넌트** ⏸️ 예정
    - 건강 상태 카드 (healthStatus, healthScore)
    - 위험 요소 리스트 (riskFactors)
    - 추천 항목 카드 (recommendations)
    - 주의 사항 알림 (warnings)
 
-2. **대시보드 연동**
+2. **대시보드 연동** ⏸️ 예정
    - InBody 상세 페이지에 분석 결과 표시
    - 분석 진행 상태 인디케이터
    - 재분석 버튼
 
-3. **상태 관리**
+3. **상태 관리** ⏸️ 예정
    - TanStack Query 캐싱 전략
    - 낙관적 업데이트
    - 자동 재검증
 
 **산출물:**
-- `src/components/ai/health-analysis-card.tsx`
-- `src/components/ai/risk-factor-list.tsx`
-- `src/components/ai/recommendation-card.tsx`
-- `src/components/ai/warning-alert.tsx`
-- `src/app/inbody/[id]/page.tsx` (수정)
+- `src/components/ai/health-analysis-card.tsx` ⏸️ 예정
+- `src/components/ai/risk-factor-list.tsx` ⏸️ 예정
+- `src/components/ai/recommendation-card.tsx` ⏸️ 예정
+- `src/components/ai/warning-alert.tsx` ⏸️ 예정
+- `src/app/inbody/[id]/page.tsx` (수정) ⏸️ 예정
 
 **완료 기준:**
-- UI 컴포넌트 단위 테스트 통과
-- 반응형 디자인 검증
-- 사용자 인터랙션 정상 작동
+- ⏸️ UI 컴포넌트 단위 테스트 통과
+- ⏸️ 반응형 디자인 검증
+- ⏸️ 사용자 인터랙션 정상 작동
 
 ---
 
@@ -160,37 +176,39 @@
 
 **목표:** 품질 보증 및 성능 최적화
 
+**상태:** ⏸️ 예정 (Phase 4 완료 후 시작)
+
 **작업 항목:**
 
-1. **단위 테스트**
+1. **단위 테스트** ⏸️ 예정
    - AI 서비스 로직 테스트
    - Zod 스키마 검증 테스트
    - API 라우트 테스트
 
-2. **통합 테스트**
+2. **통합 테스트** ⏸️ 예정
    - end-to-end AI 분석 흐름
    - 에러 복구 시나리오
    - 재시도 로직 검증
 
-3. **성능 최적화**
+3. **성능 최적화** ⏸️ 예정
    - API 응답 시간 모니터링
    - 캐싱 전략 튜닝
    - 배치 처리 고려
 
-4. **보안 검토**
+4. **보안 검토** ⏸️ 예정
    - API 키 노출 점검
    - 인증 우회 검증
    - 개인정보 포함 검증
 
 **산출물:**
-- 단위 테스트 파일 (`tests/unit/ai/`)
-- 통합 테스트 파일 (`tests/integration/ai/`)
-- 성능 보고서
+- 단위 테스트 파일 (`tests/unit/ai/`) ⏸️ 예정
+- 통합 테스트 파일 (`tests/integration/ai/`) ⏸️ 예정
+- 성능 보고서 ⏸️ 예정
 
 **완료 기준:**
-- 테스트 커버리지 85% 이상
-- 평균 응답 시간 3초 이내
-- 보안 감사 통과
+- ⏸️ 테스트 커버리지 85% 이상
+- ⏸️ 평균 응답 시간 3초 이내
+- ⏸️ 보안 감사 통과
 
 ---
 
@@ -326,12 +344,13 @@ model InBodyRecord {
 
 ## 7. 다음 단계 (Next Steps)
 
-1. **Phase 1 시작:** 의존성 설치 및 스키마 확장
-2. **전문가 상담:** AI/ML 전문가와 프롬프트 최적화 검토
-3. **위험 완화:** API 키 보안 강화, 면책 조항 추가
+1. **Phase 1 완료:** Prisma 스키마 확장 및 환경 변수 설정
+2. **Phase 2 시작:** AI 서비스 계층 구현 (GLM API 연동)
+3. **전문가 상담:** AI/ML 전문가와 프롬프트 최적화 검토
+4. **위험 완화:** API 키 보안 강화, 면책 조항 추가
 
 ---
 
-**문서 버전:** 1.0.0
+**문서 버전:** 1.1.0
 **최종 업데이트:** 2026-01-15
-**승인 상태:** draft
+**승인 상태:** in-progress

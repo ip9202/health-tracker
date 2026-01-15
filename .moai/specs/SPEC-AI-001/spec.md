@@ -9,7 +9,7 @@
 SPEC_ID: SPEC-AI-001
 Title: AI 기반 건강 분석 및 추천 시스템 (AI-Powered Health Analysis & Recommendation System)
 Created: 2026-01-15
-Status: draft
+Status: in-progress
 Priority: High
 Assigned: Alfred
 Tags: AI, InBody, Health-Analysis, GLM-API, Recommendation
@@ -20,6 +20,7 @@ Related: SPEC-DATA-003, SPEC-FE-004
 
 | 버전 | 날짜 | 변경사항 | 작성자 |
 |------|------|----------|--------|
+| 1.1.0 | 2026-01-15 | Zod 스키마 구현 완료, 진행 중 상태로 변경 | Alfred |
 | 1.0.0 | 2026-01-15 | 초안 작성 | Alfred |
 
 ---
@@ -281,28 +282,49 @@ AI_RETRY_DELAY=1000  # 1초
 
 ### 5.1 요구사항-설계 매핑
 
-| 요구사항 | 설계 요소 | 구현 파일 |
-|----------|----------|----------|
-| REQ-AI-001 | NextAuth Middleware | src/middleware.ts |
-| REQ-AI-004 | Zod Schema | src/lib/ai-schemas.ts |
-| REQ-AI-101 | Auto-trigger | src/app/api/inbody/confirm/route.ts |
-| REQ-AI-204 | Caching Logic | src/lib/ai-service.ts |
-| REQ-AI-301 | API Key Protection | .env.local |
+| 요구사항 | 설계 요소 | 구현 파일 | 상태 |
+|----------|----------|----------|------|
+| REQ-AI-001 | NextAuth Middleware | src/middleware.ts | 완료 |
+| REQ-AI-004 | Zod Schema | src/lib/ai-schemas.ts | 완료 |
+| REQ-AI-101 | Auto-trigger | src/app/api/inbody/confirm/route.ts | 예정 |
+| REQ-AI-204 | Caching Logic | src/lib/ai-service.ts | 예정 |
+| REQ-AI-301 | API Key Protection | .env.local | 예정 |
+| REQ-AI-103 | Retry Logic | src/lib/ai/service.ts | 예정 |
+| REQ-AI-104 | Result Display | src/components/ai/ | 예정 |
 
 ### 5.2 태그 블록
 
 ```
-TAG-AI-001: GLM API 클라이언트 구현
-TAG-AI-002: HealthAnalysis Prisma 모델 생성
-TAG-AI-003: AI 프롬프트 엔지니어링
-TAG-AI-004: Zod 응답 검증 스키마
-TAG-AI-005: AI 분석 API 엔드포인트
-TAG-AI-006: 재시도 및 에러 핸들링 로직
-TAG-AI-007: 건강 점수 계산 알고리즘
-TAG-AI-008: 추천 시스템 우선순위 로직
-TAG-FE-005: AI 분석 결과 UI 컴포넌트
-TAG-FE-006: 건강 분석 대시보드 페이지
+TAG-AI-001: GLM API 클라이언트 구현 [예정]
+TAG-AI-002: HealthAnalysis Prisma 모델 생성 [예정]
+TAG-AI-003: AI 프롬프트 엔지니어링 [예정]
+TAG-AI-004: Zod 응답 검증 스키마 [완료] src/lib/ai-schemas.ts
+TAG-AI-005: AI 분석 API 엔드포인트 [예정]
+TAG-AI-006: 재시도 및 에러 핸들링 로직 [예정]
+TAG-AI-007: 건강 점수 계산 알고리즘 [예정]
+TAG-AI-008: 추천 시스템 우선순위 로직 [예정]
+TAG-FE-005: AI 분석 결과 UI 컴포넌트 [예정]
+TAG-FE-006: 건강 분석 대시보드 페이지 [예정]
 ```
+
+### 5.3 구현 진행 상황
+
+**완료된 항목:**
+- TAG-AI-004: Zod 응답 검증 스키마 구현
+  - RiskFactorSchema: 위험 요소 카테고리 및 레벨 검증
+  - RecommendationSchema: 운동/영양/생활 습관 추천 검증
+  - WarningSchema: 주의 사항 심각도 및 액션 가능성 검증
+  - HealthAnalysisSchema: 통합 건강 분석 결과 검증
+
+**진행 중인 항목:**
+- Phase 1: 기반 구조 구축 (부분 완료 - Zod 스키마만 완료)
+
+**예정 항목:**
+- Phase 1: Prisma 스키마 확장, 환경 변수 설정
+- Phase 2: AI 서비스 계층 구현
+- Phase 3: API 엔드포인트 구현
+- Phase 4: 프론트엔드 UI 구현
+- Phase 5: 테스트 및 최적화
 
 ---
 
@@ -316,6 +338,6 @@ TAG-FE-006: 건강 분석 대시보드 페이지
 
 ---
 
-**문서 버전:** 1.0.0
+**문서 버전:** 1.1.0
 **최종 업데이트:** 2026-01-15
-**승인 상태:** draft
+**승인 상태:** in-progress
