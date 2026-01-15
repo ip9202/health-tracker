@@ -3,9 +3,11 @@ import type { NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 
 /**
- * NextAuth.js 미들웨어
+ * NextAuth.js 프록시
  * 인증이 필요한 라우트를 보호하고, 인증되지 않은 사용자를 로그인 페이지로 리다이렉트합니다.
- * TAG-TASK-008: 인증이 필요한 라우트 보호 미들웨어 구현
+ * TAG-TASK-008: 인증이 필요한 라우트 보호 프록시 구현
+ *
+ * @see https://nextjs.org/docs/app/api-reference/file-conventions/proxy
  */
 export default auth((req) => {
   const { pathname } = req.nextUrl
@@ -40,7 +42,7 @@ export default auth((req) => {
 })
 
 /**
- * 미들웨어가 실행될 라우트를 설정합니다.
+ * 프록시가 실행될 라우트를 설정합니다.
  * 정적 파일, 이미지, _next 내부 경로는 제외됩니다.
  */
 export const config = {
