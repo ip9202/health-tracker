@@ -224,3 +224,6 @@ dist-ssr/
 .firebase/
 .github/workflows/*.yml.bak
 .gitlab-ci.yml.bak
+
+# Serena MCP
+.serena/
