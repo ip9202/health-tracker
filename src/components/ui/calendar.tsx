@@ -1,3 +1,8 @@
+/**
+ * Calendar 컴포넌트
+ * shadcn/ui 기반의 캘린더(날짜 선택기) 컴포넌트
+ * react-day-picker를 기반으로 날짜 선택 기능을 제공
+ */
 "use client"
 
 import * as React from "react"
@@ -11,6 +16,10 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 
+/**
+ * Calendar 메인 컴포넌트
+ * 날짜 선택, 범위 선택 등의 기능을 제공
+ */
 function Calendar({
   className,
   classNames,

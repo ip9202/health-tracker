@@ -1,8 +1,16 @@
+/**
+ * Alert 컴포넌트
+ * shadcn/ui 기반의 알림 메시지 컴포넌트
+ * 사용자에게 중요한 정보나 경고를 표시
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Alert 변형 스타일 정의
+ */
 const alertVariants = cva(
   "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
   {

@@ -1,7 +1,14 @@
+/**
+ * 메인 페이지 컴포넌트
+ * Health Tracker 랜딩 페이지로 서비스 소개와 네비게이션을 제공
+ */
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+/**
+ * 메인 페이지 컴포넌트
+ */
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">

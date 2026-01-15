@@ -1,6 +1,13 @@
+/**
+ * 로그인 페이지 컴포넌트
+ * 사용자 로그인을 위한 페이지
+ */
 import Link from 'next/link'
 import SignInForm from '@/components/auth/signin-form'
 
+/**
+ * 로그인 페이지 컴포넌트
+ */
 export default function SignInPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">

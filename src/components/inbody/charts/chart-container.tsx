@@ -104,7 +104,7 @@ export function ChartContainer() {
 
         {/* 라인 차트 */}
         <div className="h-[250px]">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={250}>
             <LineChart data={sampleData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
               <XAxis

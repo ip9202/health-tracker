@@ -1,7 +1,16 @@
+/**
+ * Card 컴포넌트
+ * shadcn/ui 기반의 카드 레이아웃 컴포넌트 모음
+ * Header, Content, Footer 등의 하위 컴포넌트로 구성
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Card 메인 컨테이너
+ * 카드의 기본 스타일과 레이아웃을 정의
+ */
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>

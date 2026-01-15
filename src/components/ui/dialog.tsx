@@ -1,3 +1,8 @@
+/**
+ * Dialog 컴포넌트
+ * shadcn/ui 기반의 다이얼로그(모달) 컴포넌트 모음
+ * Radix UI Dialog를 기반으로 접근성과 애니메이션을 지원
+ */
 "use client"
 
 import * as React from "react"
@@ -6,6 +11,10 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Dialog 루트 컴포넌트
+ * 다이얼로그의 상태를 관리하는 컨텍스트를 제공
+ */
 const Dialog = DialogPrimitive.Root
 
 const DialogTrigger = DialogPrimitive.Trigger

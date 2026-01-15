@@ -1,3 +1,8 @@
+/**
+ * Popover 컴포넌트
+ * shadcn/ui 기반의 팝오버 컴포넌트
+ * Radix UI Popover를 기반으로 트리거 주변에 풍선 도움말을 표시
+ */
 "use client"
 
 import * as React from "react"
@@ -5,12 +10,27 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Popover 루트 컴포넌트
+ */
 const Popover = PopoverPrimitive.Root
 
+/**
+ * Popover 트리거 컴포넌트
+ * 클릭하여 팝오버를 표시하는 요소
+ */
 const PopoverTrigger = PopoverPrimitive.Trigger
 
+/**
+ * Popover 앵커 컴포넌트
+ * 팝오버 위치를 기준으로 삼는 요소
+ */
 const PopoverAnchor = PopoverPrimitive.Anchor
 
+/**
+ * Popover 콘텐츠 컴포넌트
+ * 팝오버로 표시할 내용
+ */
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>

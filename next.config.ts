@@ -1,15 +1,15 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  // Turbopack 비활성화 - webpack 사용
-  // webpack: (config, { isServer }) => {
-  //   return config
-  // },
-
+  /**
+   * 실험적 기능 설정
+   */
   experimental: {
-    // Turbopack 비활성화
-    turbo: undefined,
-
+    /**
+     * Server Actions 설정
+     * Next.js 16.1.1에서는 experimental 내부에 위치
+     * @see https://nextjs.org/docs/app/api-reference/config/next-config-js/serverActions
+     */
     serverActions: {
       allowedOrigins: ['localhost:3000']
     }

@@ -1,6 +1,13 @@
+/**
+ * 회원가입 페이지 컴포넌트
+ * 신규 사용자 회원가입을 위한 페이지
+ */
 import Link from 'next/link'
 import SignUpForm from '@/components/auth/signup-form'
 
+/**
+ * 회원가입 페이지 컴포넌트
+ */
 export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">

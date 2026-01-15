@@ -1,8 +1,16 @@
+/**
+ * Badge 컴포넌트
+ * shadcn/ui 기반의 배지(라벨) 컴포넌트
+ * 상태, 카테고리, 카운트 등을 시각적으로 표시
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Badge 변형 스타일 정의
+ */
 const badgeVariants = cva(
   "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {

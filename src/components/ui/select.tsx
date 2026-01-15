@@ -1,3 +1,8 @@
+/**
+ * Select 컴포넌트
+ * shadcn/ui 기반의 드롭다운 선택 컴포넌트
+ * Radix UI Select를 기반으로 접근성과 키보드 네비게이션을 지원
+ */
 "use client"
 
 import * as React from "react"
@@ -6,12 +11,27 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Select 루트 컴포넌트
+ */
 const Select = SelectPrimitive.Root
 
+/**
+ * Select 그룹 컴포넌트
+ * 관련 옵션들을 그룹화
+ */
 const SelectGroup = SelectPrimitive.Group
 
+/**
+ * Select 값 표시 컴포넌트
+ * 선택된 값을 표시
+ */
 const SelectValue = SelectPrimitive.Value
 
+/**
+ * Select 트리거 컴포넌트
+ * 클릭하여 옵션 목록을 표시하는 버튼
+ */
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
