@@ -14,7 +14,7 @@
 
 **목표:** AI 통합을 위한 기반 인프라 구축
 
-**상태:** 🟡 진행 중 (Zod 스키마 완료, 나머지 예정)
+**상태:** ✅ 완료
 
 **작업 항목:**
 
@@ -56,7 +56,7 @@
 
 **목표:** GLM API 연동 및 핵심 비즈니스 로직 구현
 
-**상태:** ⏸️ 예정 (Phase 1 완료 후 시작)
+**상태:** ✅ 완료
 
 **작업 항목:**
 
@@ -98,7 +98,7 @@
 
 **목표:** AI 분석 기능을 위한 RESTful API 구현
 
-**상태:** ⏸️ 예정 (Phase 2 완료 후 시작)
+**상태:** ✅ 완료
 
 **작업 항목:**
 
@@ -138,7 +138,7 @@
 
 **목표:** AI 분석 결과 시각화 및 사용자 인터랙션
 
-**상태:** ⏸️ 예정 (Phase 3 완료 후 시작)
+**상태:** ✅ 완료
 
 **작업 항목:**
 
@@ -176,7 +176,7 @@
 
 **목표:** 품질 보증 및 성능 최적화
 
-**상태:** ⏸️ 예정 (Phase 4 완료 후 시작)
+**상태:** ✅ 완료
 
 **작업 항목:**
 
@@ -229,7 +229,7 @@
 ```bash
 # .env.local
 GLM_API_BASE_URL=https://api.z.ai/api/anthropic
-GLM_API_KEY=e052c325add248fdb95ce210a8d6d9e2.cgpUX5tmDTk4eTNE
+GLM_API_KEY=your-glm-api-key-here
 GLM_MODEL_VERSION=claude-3-5-sonnet-20241022
 AI_ANALYSIS_TIMEOUT=30000
 AI_MAX_RETRIES=3
@@ -351,6 +351,6 @@ model InBodyRecord {
 
 ---
 
-**문서 버전:** 1.1.0
+**문서 버전:** 1.2.0
 **최종 업데이트:** 2026-01-15
-**승인 상태:** in-progress
+**승인 상태:** completed

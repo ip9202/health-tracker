@@ -6,30 +6,44 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-01-15
+
 ### 추가 (Added)
-- SPEC-AI-001: AI 기반 건강 분석 및 추천 시스템 (진행 중)
-  - Zod 응답 검증 스키마 구현 (TAG-AI-004)
-  - RiskFactorSchema: 위험 요소 카테고리 및 레벨 검증
-  - RecommendationSchema: 운동/영양/생활 습관 추천 검증
-  - WarningSchema: 주의 사항 심각도 및 액션 가능성 검증
-  - HealthAnalysisSchema: 통합 건강 분석 결과 검증
-- SPEC-FE-004: InBody 데이터 관리 대시보드 기능
-  - 드래그 앤 드롭 이미지 업로드 UI
-  - 파일 형식 검증 (JPG/PNG)
-  - 파일 크기 제한 (10MB)
-  - 업로드 진행률 표시 컴포넌트
-  - InBody API 클라이언트 (업로드, 조회, 삭제)
-  - TypeScript 타입 정의 및 Zod 스키마 검증
-  - 반응형 대시보드 레이아웃
+- SPEC-AI-001: AI 기반 건강 분석 및 추천 시스템 완료
+  - TAG-AI-001: GLM API 클라이언트 구현
+  - TAG-AI-002: HealthAnalysis Prisma 모델 생성
+  - TAG-AI-003: AI 프롬프트 엔지니어링
+  - TAG-AI-004: Zod 응답 검증 스키마
+    - RiskFactorSchema: 위험 요소 카테고리 및 레벨 검증
+    - RecommendationSchema: 운동/영양/생활 습관 추천 검증
+    - WarningSchema: 주의 사항 심각도 및 액션 가능성 검증
+    - HealthAnalysisSchema: 통합 건강 분석 결과 검증
+  - TAG-AI-005: AI 분석 API 엔드포인트
+  - TAG-AI-006: 재시도 및 에러 핸들링 로직
+  - TAG-AI-007: 건강 점수 계산 알고리즘
+  - TAG-AI-008: 추천 시스템 우선순위 로직
+  - TAG-FE-005: AI 분석 결과 UI 컴포넌트
+  - TAG-FE-006: 건강 분석 대시보드 페이지
+
+### 구현된 기능
+- **건강 상태 분석**: AI 기반 체성분 데이터 종합 분석
+- **맞춤형 추천**: 개인별 운동 및 생활 습관 추천
+- **위험 요소 식별**: 건강 위험 요소 자동 감지
+- **주의 사항 안내**: 건강 관리 주의 사항 제공
+- **재시도 로직**: API 호출 실패 시 자동 재시도 (최대 3회)
+- **캐싱 시스템**: 기존 분석 결과 재사용
+- **보안 강화**: API 키 서버 측 보안, 개인정보 제외
 
 ### 변경 (Changed)
 - NextAuth.js 5 beta 버전으로 업그레이드
 - Prisma 6.0.0으로 업그레이드
 - React 19로 업그레이드
+- 메인 페이지를 InBody 대시보드로 변경
 
 ### 수정 (Fixed)
 - 인증 미들웨어 경로 처리 개선
 - 비밀번호 해싱 보안 강화
+- Zod 스키마 errorMap 호환성 문제 해결
 
 ## [0.1.0] - 2026-01-14
 

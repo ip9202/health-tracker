@@ -31,9 +31,7 @@ export const RecommendationSchema = z.object({
   }),
   title: z.string().min(1, { message: '추천 제목은 필수입니다' }),
   description: z.string().min(1, { message: '추천 설명은 필수입니다' }),
-  priority: z.number().int().min(1).max(5, {
-    errorMap: () => ({ message: '우선순위는 1-5 사이의 정수여야 합니다' }),
-  }),
+  priority: z.number().int().min(1, { message: '우선순위는 1 이상이어야 합니다' }).max(5, { message: '우선순위는 5 이하이어야 합니다' }),
 });
 
 /**
@@ -56,9 +54,7 @@ export const WarningSchema = z.object({
  */
 export const HealthAnalysisSchema = z.object({
   healthStatus: z.string().min(1, { message: '건강 상태는 필수입니다' }),
-  healthScore: z.number().int().min(0).max(100, {
-    errorMap: () => ({ message: '건강 점수는 0-100 사이의 정수여야 합니다' }),
-  }),
+  healthScore: z.number().int().min(0, { message: '건강 점수는 0 이상이어야 합니다' }).max(100, { message: '건강 점수는 100 이하이어야 합니다' }),
   riskFactors: z.array(RiskFactorSchema).default([]),
   recommendations: z.array(RecommendationSchema).default([]),
   warnings: z.array(WarningSchema).default([]),
