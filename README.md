@@ -11,8 +11,20 @@ Health Tracker는 사용자의 건강 데이터를 효율적으로 관리하기 
 ### InBody 대시보드
 - **이미지 업로드**: 드래그 앤 드롭으로 InBody 이미지를 쉽게 업로드
 - **OCR 데이터 추출**: 업로드된 이미지에서 체성분 데이터 자동 추출
+  - **신체점수 추출 정확도**: 95% 목표 (16개 패턴, 5개 전처리 기능)
+  - **다양한 InBody 기기 지원**: InBody 770/970/720, OntoFit
+  - **다단계 추출 전략**: 높은 신뢰도 → 중간 신뢰도 → 낮은 신뢰도
+  - **에러 복구 시스템**: 자동 재시도 및 사용자 가이드
 - **데이터 시각화**: 체중, 체지방율, 골격근량 등을 차트로 확인 (예정)
 - **기록 관리**: 과거 측정 기록 조회 및 관리 (예정)
+
+**구현된 OCR 추출 기능:**
+- TAG-OCR-001: 이미지 전처리 모듈 (그레이스케일, 대비, 노이즈, 이진화, 회전 보정)
+- TAG-OCR-002: 정규식 패턴 라이브러리 (16개 패턴)
+- TAG-OCR-003: 다단계 추출 엔진
+- TAG-OCR-004: OCR 설정 최적화
+- TAG-OCR-005: 에러 처리 및 재시도 시스템
+- TAG-OCR-008: API 엔드포인트 확장
 
 ### AI 건강 분석
 - **건강 상태 분석**: AI 기반 체성분 데이터 종합 분석
@@ -146,12 +158,18 @@ health/
 ├── tests/
 │   ├── unit/               # 단위 테스트
 │   └── integration/        # 통합 테스트
+├── docs/
+│   ├── api/                # API 문서
+│   │   └── inbody-api.md   # InBody API 가이드
+│   └── developers/         # 개발자 가이드
+│       └── ocr-extraction-guide.md  # OCR 추출 시스템 가이드
 └── .moai/
     ├── specs/              # SPEC 문서
     │   ├── SPEC-AI-001/    # AI 건강 분석 시스템
     │   ├── SPEC-AUTH-001/  # 사용자 인증 시스템
     │   ├── SPEC-DATA-003/  # InBody OCR 데이터 추출
-    │   └── SPEC-FE-004/    # InBody 대시보드
+    │   ├── SPEC-FE-004/    # InBody 대시보드
+    │   └── SPEC-OCR-001/   # OCR 정확도 향상 시스템
     └── config/             # MoAI-ADK 설정
 ```
 
@@ -175,6 +193,12 @@ await deleteInBodyRecord(recordId)
 ```
 
 상세한 API 사용법은 [docs/api/inbody-api.md](docs/api/inbody-api.md)를 참조하세요.
+
+**OCR 추출 API:**
+- `fetchExtractionDetail`: 추출 상세 정보 조회
+- `retryExtraction`: 강화된 전처리로 추출 재시도
+
+상세한 OCR 추출 시스템 사용법은 [docs/developers/ocr-extraction-guide.md](docs/developers/ocr-extraction-guide.md)를 참조하세요.
 
 ### AI 건강 분석 API
 
