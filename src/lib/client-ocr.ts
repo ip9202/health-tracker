@@ -4,17 +4,36 @@
  * SPEC-DATA-002: 이미지에서 텍스트 추출
  */
 
-import Tesseract from 'tesseract.js';
+import Tesseract, { PSM } from 'tesseract.js';
 import { preprocessImage, PreprocessingOptions, calculateImageQuality } from './image-preprocessor';
 import type { ImageQualityMetrics as Metrics } from './types/extraction';
+import { PsmMode, calculateImageQuality as calculateOcrImageQuality, getRecommendedConfig } from './ocr-config';
 
-// image-preprocessor의 기본 옵션과 동일하게 유지
+/**
+ * PsmMode를 Tesseract.js PSM 문자열로 변환
+ */
+function mapPsmModeToTesseract(psmMode: PsmMode): PSM {
+  switch (psmMode) {
+    case PsmMode.AUTO:
+      return PSM.AUTO;
+    case PsmMode.UNIFORM_BLOCK:
+      return PSM.SINGLE_BLOCK;
+    case PsmMode.SPARSE_TEXT:
+      return PSM.SPARSE_TEXT;
+    case PsmMode.RAW_LINE:
+      return PSM.RAW_LINE;
+    default:
+      return PSM.AUTO;
+  }
+}
+
+// 한국어 OCR 최적화 전처리 옵션
 const DEFAULT_PREPROCESS_OPTIONS: Required<PreprocessingOptions> = {
   grayscale: true,
-  contrast: 1.2,
+  contrast: 1.8, // 대비 강화 (1.2 → 1.8)
   denoise: true,
-  binarize: false,
-  binarizeThreshold: 128,
+  binarize: true, // 이진화 활성화
+  binarizeThreshold: 140, // 임계값 조정
   correctRotation: true,
 };
 
@@ -170,9 +189,19 @@ export async function extractTextFromImageClient(
 ): Promise<ClientOCRResult> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
+  console.log('[Client OCR] === OCR 처리 시작 ===');
+  console.log('[Client OCR] 파일명:', file.name, '크기:', (file.size / 1024).toFixed(2), 'KB');
+  console.log('[Client OCR] 옵션:', {
+    language: opts.language,
+    preprocess: opts.preprocess,
+    preprocessOptions: opts.preprocessOptions,
+    returnQualityMetrics: opts.returnQualityMetrics,
+  });
+
   try {
     // 파일을 Canvas로 변환
     const originalCanvas = await fileToCanvas(file);
+    console.log('[Client OCR] 원본 이미지 크기:', originalCanvas.width, 'x', originalCanvas.height);
 
     // 전처리 수행
     let processedCanvas = originalCanvas;
@@ -180,6 +209,7 @@ export async function extractTextFromImageClient(
     let afterMetrics: Metrics | undefined;
 
     if (opts.preprocess) {
+      console.log('[Client OCR] 전처리 시작...');
       const preprocessResult = await performPreprocessing(
         originalCanvas,
         opts.preprocessOptions,
@@ -190,12 +220,49 @@ export async function extractTextFromImageClient(
       processedCanvas = preprocessResult.processedCanvas;
       beforeMetrics = preprocessResult.beforeMetrics;
       afterMetrics = preprocessResult.afterMetrics;
+
+      console.log('[Client OCR] 전처리 완료');
+      if (opts.returnQualityMetrics && beforeMetrics && afterMetrics) {
+        console.log('[Client OCR] 품질 비교:', {
+          before: beforeMetrics.overallScore.toFixed(1),
+          after: afterMetrics.overallScore.toFixed(1),
+          improvement: calculateImprovement(beforeMetrics, afterMetrics).toFixed(1) + '%',
+        });
+      }
+    } else {
+      console.log('[Client OCR] 전처리 건너뜀 (preprocess=false)');
     }
 
     // 전처리된 이미지를 Data URL로 변환
     const imageUrl = processedCanvas.toDataURL('image/png');
 
+    // 이미지 품질 기반 PSM 모드 결정
+    let psmMode = PsmMode.AUTO; // 기본값
+    if (afterMetrics) {
+      // ocr-config의 calculateImageQuality 사용하여 품질 분석
+      const qualityConfig = calculateOcrImageQuality({
+        width: processedCanvas.width,
+        height: processedCanvas.height,
+        hasNoise: afterMetrics.noiseLevel > 0.15,
+        contrast: afterMetrics.contrast > 200 ? 'high' : afterMetrics.contrast > 100 ? 'medium' : 'low',
+        brightness: afterMetrics.brightness > 200 ? 'bright' : afterMetrics.brightness < 100 ? 'dark' : 'optimal',
+        textDensity: 'uniform', // InBody 결과지는 균일한 레이아웃
+      });
+
+      const recommendedConfig = getRecommendedConfig(qualityConfig);
+      psmMode = recommendedConfig.psmMode;
+
+      console.log('[Client OCR] 품질 기반 PSM 모드 결정:', {
+        qualityScore: qualityConfig.qualityScore,
+        recommendedPsm: psmMode,
+        confidenceThreshold: recommendedConfig.confidenceThreshold,
+      });
+    }
+
     // Tesseract.js worker 생성 및 실행
+    console.log('[Client OCR] Worker 생성, PSM 모드:', psmMode);
+
+    // Tesseract.js v7 API: createWorker(lang, oem, options)
     const worker = await Tesseract.createWorker(opts.language, 1, {
       logger: (m: { status: string; progress: number }) => {
         opts.onProgress({
@@ -205,7 +272,20 @@ export async function extractTextFromImageClient(
       },
     });
 
+    // PSM 모드 설정 (Tesseract.js 파라미터)
+    // PsmMode를 Tesseract.js PSM 문자열로 변환
+    const tesseractPsm = mapPsmModeToTesseract(psmMode);
+    try {
+      await worker.setParameters({
+        tessedit_pageseg_mode: tesseractPsm,
+      });
+      console.log('[Client OCR] PSM 모드 설정 완료:', tesseractPsm);
+    } catch (e) {
+      console.warn('[Client OCR] PSM 모드 설정 실패, 기본값 사용:', e);
+    }
+
     // OCR 실행
+    console.log('[Client OCR] Tesseract OCR 시작...');
     const result = await worker.recognize(imageUrl);
 
     // worker 종료
@@ -216,6 +296,13 @@ export async function extractTextFromImageClient(
 
     const text = result.data.text.trim();
     const confidence = result.data.confidence;
+
+    console.log('[Client OCR] OCR 결과:', {
+      textLength: text.length,
+      confidence: confidence.toFixed(2),
+      preview: text.substring(0, 200) + (text.length > 200 ? '...' : ''),
+    });
+    console.log('[Client OCR] === OCR 처리 완료 ===');
 
     // 결과 생성
     const baseResult: ClientOCRResult = {
@@ -234,6 +321,7 @@ export async function extractTextFromImageClient(
 
     return baseResult;
   } catch (error) {
+    console.error('[Client OCR] ❌ 오류 발생:', error);
     throw new Error(
       `OCR 처리 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`,
     );

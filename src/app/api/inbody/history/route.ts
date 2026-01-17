@@ -24,24 +24,12 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
-    // 기록 조회 (최신순)
+    // 기록 조회 (최신순) - 전체 필드 반환
     const records = await prisma.inBodyRecord.findMany({
       where: { userId },
       orderBy: { measuredAt: 'desc' },
       take: limit,
       skip: offset,
-      select: {
-        id: true,
-        measuredAt: true,
-        weight: true,
-        bodyFatPercentage: true,
-        muscle: true,
-        skeletalMuscle: true,
-        bodyScore: true,
-        bmi: true,
-        ocrConfidence: true,
-        createdAt: true,
-      },
     });
 
     // 전체 개수 조회
@@ -49,17 +37,22 @@ export async function GET(request: NextRequest) {
       where: { userId },
     });
 
+    // InBodyData 형식으로 변환 (필드명 매핑)
+    const mappedRecords = records.map((record) => ({
+      ...record,
+      // InBodyData 형식에 맞춰 필드명 변환
+      bodyFat: record.bodyFatPercentage,
+      weightChangeRecommendation: record.weightControl,
+      dailyCalories: record.calorieNeeds,
+      // imagePath 필드 추가 (데이터베이스에 없으므로 빈 문자열)
+      imagePath: '',
+    }));
+
     return NextResponse.json({
-      success: true,
-      data: {
-        records,
-        pagination: {
-          total,
-          limit,
-          offset,
-          hasMore: offset + records.length < total,
-        },
-      },
+      records: mappedRecords,
+      total,
+      page: Math.floor(offset / limit) + 1,
+      pageSize: limit,
     });
   } catch (error) {
     return NextResponse.json(

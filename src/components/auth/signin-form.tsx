@@ -1,28 +1,21 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 /**
  * 로그인 폼 컴포넌트
+ * SPEC: SPEC-AUTH-001
  */
 export default function SignInForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
-
-  useEffect(() => {
-    const message = searchParams.get('message')
-    if (message) {
-      setSuccessMessage(message)
-    }
-  }, [searchParams])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -62,28 +55,26 @@ export default function SignInForm() {
     }
 
     setIsLoading(true)
+    setErrors({})
 
     try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
+      // NextAuth signIn 함수를 사용하여 세션 생성
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setErrors({ form: data.error || '로그인에 실패했습니다.' })
+      if (result?.error) {
+        setErrors({ form: '이메일 또는 비밀번호가 올바르지 않습니다.' })
         return
       }
 
-      // Success - redirect to dashboard
-      router.push('/inbody')
+      if (result?.ok) {
+        // 로그인 성공 - 메인 대시보드로 이동
+        router.push('/')
+        router.refresh()
+      }
     } catch (error) {
       setErrors({ form: '서버 오류가 발생했습니다. 다시 시도해주세요.' })
     } finally {
@@ -94,12 +85,6 @@ export default function SignInForm() {
   return (
     <div className="w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {successMessage && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-            <p className="text-sm text-green-600">{successMessage}</p>
-          </div>
-        )}
-
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
             이메일

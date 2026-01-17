@@ -114,7 +114,35 @@ model InBodyRecord {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
+  // TAG-AI-002: HealthAnalysis와 1:1 관계
+  healthAnalysis    HealthAnalysis?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, measuredAt])
+}
+
+// TAG-AI-002: HealthAnalysis Prisma 모델
+// SPEC-AI-001: AI 기반 건강 분석 및 추천 시스템
+model HealthAnalysis {
+  id                String   @id @default(cuid())
+  inbodyRecordId    String   @unique
+  inbodyRecord      InBodyRecord @relation(fields: [inbodyRecordId], references: [id], onDelete: Cascade)
+
+  // AI 분석 결과
+  healthStatus      String   // 전체 건강 상태 (ex: "양호", "관리 필요", "개선 필요")
+  healthScore       Int      // 건강 점수 (0-100)
+  riskFactors       String   // 위험 요소 목록 (JSON)
+  recommendations   String   // 운동/생활 습관 추천 (JSON)
+  warnings          String   // 주의 사항 (JSON)
+
+  // AI 메타데이터
+  modelVersion      String   // 사용된 AI 모델 버전
+  confidence        Float?   // 분석 신뢰도
+  analysisToken     String?  // AI API 토큰 (추적용)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([inbodyRecordId])
 }

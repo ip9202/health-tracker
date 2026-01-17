@@ -1,9 +1,10 @@
 /**
  * TAG-DATA-TASK-004: Tesseract.js OCR 서비스 구현
  * SPEC-DATA-002: 이미지에서 텍스트 추출
+ * 환경: Next.js API Routes (Node.js)
  */
 
-import Tesseract from 'tesseract.js';
+import { createWorker } from 'tesseract.js';
 
 /**
  * OCR 처리 결과
@@ -33,19 +34,39 @@ interface OCRServiceOptions {
 
 const DEFAULT_OPTIONS: Required<OCRServiceOptions> = {
   timeout: 30000, // 30초
-  maxRetries: 3,
-  minConfidence: 50,
+  maxRetries: 1, // Node.js 환경에서는 재시도 줄임
+  minConfidence: 30, // 신뢰도 낮춤 (테스트용)
 };
 
-/**
- * Tesseract.js OCR 서비스
- * SPEC-DATA-002: 이미지에서 텍스트 추출
- */
+// Worker 캐싱 (재사용을 위해)
+let worker: Awaited<ReturnType<typeof createWorker>> | null = null;
 
 /**
- * 이미지에서 텍스트를 추출합니다
+ * Worker를 초기화합니다
+ */
+async function getWorker() {
+  if (!worker) {
+    worker = await createWorker('kor+eng', 1, {
+      logger: () => {}, // 로그 비활성화
+    });
+  }
+  return worker;
+}
+
+/**
+ * Worker를 종료합니다
+ */
+export async function cleanupWorker() {
+  if (worker) {
+    await worker.terminate();
+    worker = null;
+  }
+}
+
+/**
+ * 이미지에서 텍스트를 추출합니다 (Node.js 환경용)
  *
- * @param imagePath - 이미지 파일 경로 또는 Buffer
+ * @param imagePath - 이미지 Data URL 또는 경로
  * @param options - OCR 서비스 설정
  * @returns 추출된 텍스트와 신뢰도
  */
@@ -55,58 +76,36 @@ export async function extractTextFromImage(
 ): Promise<OCRResult> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
-  let lastError: Error | null = null;
+  try {
+    // Worker 초기화
+    const worker = await getWorker();
 
-  // 재시도 로직
-  for (let attempt = 1; attempt <= opts.maxRetries; attempt++) {
-    try {
-      // 타임아웃 Promise 생성
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('OCR timeout')), opts.timeout);
-      });
+    // 타임아웃 Promise 생성
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('OCR timeout')), opts.timeout);
+    });
 
-      // OCR 처리
-      const result = await Promise.race([
-        Tesseract.recognize(imagePath, 'kor+eng', {
-          logger: (m: { status: string; progress: number }) => {
-            // 진행 상황 로그 (선택사항)
-            if (m.status === 'recognizing text') {
-              // console.log(`OCR 진행률: ${Math.round(m.progress * 100)}%`);
-            }
-          },
-        }),
-        timeoutPromise,
-      ]);
+    // OCR 처리 (타임아웃과 함께 실행)
+    const result = await Promise.race([
+      worker.recognize(imagePath),
+      timeoutPromise,
+    ]);
 
-      const text = result.data.text.trim();
-      const confidence = result.data.confidence;
+    const text = result.data.text.trim();
+    const confidence = result.data.confidence;
 
-      // 신뢰도 검증
-      if (confidence < opts.minConfidence) {
-        throw new Error(
-          `OCR 신뢰도가 낮습니다: ${confidence.toFixed(2)}% (최소: ${opts.minConfidence}%)`,
-        );
-      }
-
-      return {
-        text,
-        confidence,
-      };
-    } catch (error) {
-      lastError = error as Error;
-
-      // 마지막 시도가 아니면 재시도
-      if (attempt < opts.maxRetries) {
-        // 지수 백오프 (2초, 4초, 8초...)
-        const delay = Math.pow(2, attempt) * 1000;
-        await new Promise((resolve) => setTimeout(resolve, delay));
-        continue;
-      }
+    // 신뢰도 검증
+    if (confidence < opts.minConfidence) {
+      console.warn(`OCR 신뢰도가 낮습니다: ${confidence.toFixed(2)}% (최소: ${opts.minConfidence}%)`);
     }
-  }
 
-  // 모든 재시도 실패
-  throw new Error(`OCR 처리 실패: ${lastError?.message || '알 수 없는 오류'}`);
+    return {
+      text,
+      confidence,
+    };
+  } catch (error) {
+    throw new Error(`OCR 처리 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+  }
 }
 
 /**

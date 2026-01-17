@@ -32,7 +32,7 @@ export function HistoryItem({ record }: HistoryItemProps) {
           </div>
           <div>
             <span className="text-muted-foreground">체지방률: </span>
-            <span className="font-medium">{record.bodyFat || '-'} %</span>
+            <span className="font-medium">{record.bodyFatPercentage || '-'} %</span>
           </div>
           <div>
             <span className="text-muted-foreground">근육량: </span>

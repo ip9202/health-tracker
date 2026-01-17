@@ -1,10 +1,12 @@
 /**
  * 루트 레이아웃 컴포넌트
- * 애플리케이션의 최상위 레이아웃을 정의하고 QueryClient를 제공
+ * 애플리케이션의 최상위 레이아웃을 정의하고 QueryClient, Session을 제공
+ * SPEC: SPEC-AUTH-001
  */
 import type { Metadata } from 'next'
 import './globals.css'
 import { QueryClientProvider } from '@/components/providers/query-provider'
+import { SessionProvider } from '@/components/providers/session-provider'
 
 /**
  * 페이지 메타데이터
@@ -26,9 +28,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="antialiased">
-        <QueryClientProvider>
-          {children}
-        </QueryClientProvider>
+        <SessionProvider>
+          <QueryClientProvider>
+            {children}
+          </QueryClientProvider>
+        </SessionProvider>
       </body>
     </html>
   )

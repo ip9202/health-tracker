@@ -2,7 +2,7 @@
 
 ## 개요
 
-VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스택 웹 애플리케이션입니다. TypeScript를 사용하여 타입 안전성을 보장하고, Prisma ORM으로 데이터베이스를 관리합니다.
+VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스택 웹 애플리케이션입니다. TypeScript를 사용하여 타입 안전성을 보장하고, Prisma ORM으로 데이터베이스를 관리합니다. AI 기반 건강 분석을 위해 Anthropic Claude SDK를 통합했습니다.
 
 ## 핵심 기술 스택
 
@@ -65,7 +65,8 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 - Line Chart: 체중, BMI 추이
 - Bar Chart: 기간별 비교
 - Area Chart: 체지방율 변화
-- Pie Chart: 체성분 구성
+- Pie Chart: 건강 점수, 체성분 구성
+- Radar Chart: 다중 지표 비교
 
 #### react-dropzone 14.3.8
 
@@ -96,10 +97,10 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 
 **제공 컴포넌트**
 
-- Button, Input, Card
-- Dialog, Dropdown
-- Form, Label
-- Table, Pagination
+- Button, Input, Card, Progress
+- Dialog, Dropdown, Select
+- Form, Label, Tabs
+- Table, Pagination, Tooltip
 
 ### 백엔드
 
@@ -136,7 +137,46 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 - JSON 데이터 타입 지원
 - 확장성 및 안정성
 
-#### NextAuth.js 5 (beta.25)
+### AI/ML (NEW)
+
+#### Anthropic Claude SDK 0.71.2
+
+**선택 사유**
+
+- 고성능 AI 모델 (claude-3-5-sonnet)
+- 건강 데이터 분석에 최적화
+- GLM API와 호환
+- 구조화된 출력 지원
+
+**주요 기능**
+
+- 건강 상태 평가 (0-100점)
+- 위험 요소 자동 식별
+- 맞춤형 추천 생성
+- 주의 사항 알림
+
+**모델 설정**
+
+```typescript
+model: claude-3-5-sonnet-20241022
+maxTokens: 4096
+temperature: 0.7
+timeout: 30000ms
+maxRetries: 3
+```
+
+#### Zod 스키마 (AI)
+
+**선택 사유**
+
+- AI 응답 구조화
+- 런타임 타입 검증
+- 명확한 에러 메시지
+- TypeScript와 완벽 통합
+
+### 인증
+
+#### NextAuth.js 5.0.0-beta.25
 
 **선택 사유**
 
@@ -148,9 +188,31 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 **주요 기능**
 
 - Credentials Provider (이메일/비밀번호)
-- JWT 세션 관리
+- JWT 세션 관리 (30일 유효)
 - 보안 라우트 보호
 - CSRF 보호
+- 세션 Provider
+
+**구성**
+
+```typescript
+// JWT Strategy
+strategy: "jwt"
+maxAge: 30 * 24 * 60 * 60 // 30일
+
+// Credentials Provider
+credentials: {
+  email: { label: "Email", type: "email" },
+  password: { label: "Password", type: "password" }
+}
+
+// Session Callback
+callbacks: {
+  session({ token, user }) { return { ...session, user } }
+}
+```
+
+### OCR
 
 #### Tesseract.js 7.0.0
 
@@ -168,6 +230,15 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 - 진행률 이벤트
 - Worker 기반 비동기 처리
 
+#### 클라이언트 OCR (NEW)
+
+**선택 사유**
+
+- 브라우저 네이티브 OCR
+- 실시간 진행률 표시
+- 서버 부하 감소
+- 개인정보 보호
+
 ### 데이터 검증
 
 #### Zod 3.25.76
@@ -182,6 +253,7 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 **주요 사용처**
 
 - InBody 데이터 스키마
+- AI 분석 결과 스키마 (NEW)
 - 회원가입 입력 검증
 - API 파라미터 검증
 - 폼 데이터 검증
@@ -198,8 +270,10 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 
 **설정**
 
-- salt rounds: 10
-- 평문 비밀번호 미저장
+```typescript
+saltRounds: 10
+// 평문 비밀번호 미저장
+```
 
 ### 테스트
 
@@ -230,7 +304,7 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 
 ### 스타일링
 
-#### Tailwind CSS
+#### Tailwind CSS 3.4.19
 
 **선택 사유**
 
@@ -250,7 +324,7 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 
 ### 필수 구성 요소
 
-#### Node.js 20+
+#### Node.js 22+
 
 - Next.js 16 최신 기능 지원
 - ES Modules 지원
@@ -271,7 +345,7 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 
 #### Docker
 
-- PostgreSQL 컨테이이너 실행
+- PostgreSQL 컨테이너 실행
 - 일관된 개발 환경
 - 배포 시 컨테이너화
 
@@ -288,7 +362,7 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 - IDE 자동완성
 - 리팩토링 지원
 
-#### ESLint + Prettier
+#### ESLint 9.0.0
 
 - 코드 스타일 통일
 - 자동 포맷팅
@@ -300,37 +374,71 @@ VIBE Health는 Next.js 16 App Router와 React 19를 기반으로 하는 풀스�
 - Tailwind CSS IntelliSense
 - ES7+ React/Redux/React-Native snippets
 - TypeScript Importer
+- Vitest
 
-## 배포 환경
-
-### 추천 플랫폼
-
-#### Vercel (프론트엔드)
-
-- Next.js 개발사 플랫폼
-- Zero-config 배포
-- 자동 HTTPS
-- Edge Network 지원
-
-#### Railway / Supabase (PostgreSQL)
-
-- 관리형 PostgreSQL
-- 자동 백업
-- 확장성
-
-### 환경 변수
+## 환경 변수
 
 ```bash
 # 데이터베이스
-DATABASE_URL=
+DATABASE_URL="postgresql://user:password@host:port/database"
+
+# AI 서비스 (NEW)
+GLM_API_BASE_URL="https://api.z.ai/api/anthropic"
+GLM_API_KEY="your_api_key_here"
+GLM_MODEL_VERSION="claude-3-5-sonnet-20241022"
+AI_ANALYSIS_TIMEOUT="30000"
+AI_MAX_RETRIES="3"
+AI_RETRY_DELAY="1000"
 
 # NextAuth
-NEXTAUTH_SECRET=
-NEXTAUTH_URL=
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your_secret_key_here"
 
 # OAuth (선택)
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+```
+
+## AI 서비스 아키텍처 (NEW)
+
+### 서비스 구조
+
+```
+src/lib/ai-service.ts
+├── analyzeHealthData()      # 건강 데이터 분석
+├── generateRecommendations() # 추천사항 생성
+├── identifyRiskFactors()    # 위험 요소 식별
+└── calculateHealthScore()   # 건강 점수 계산
+```
+
+### 프롬프트 시스템
+
+```
+src/lib/prompts/health-analysis.ts
+├── buildHealthAnalysisPrompt() # 분석 프롬프트
+├── buildRecommendationPrompt() # 추천 프롬프트
+└── buildWarningPrompt()        # 주의사항 프롬프트
+```
+
+### 스키마 검증
+
+```
+src/lib/ai-schemas.ts
+├── HealthAnalysisSchema      # 분석 결과 스키마
+├── RiskFactorSchema          # 위험 요소 스키마
+├── RecommendationSchema      # 추천사항 스키마
+└── WarningSchema             # 주의사항 스키마
+```
+
+### API 통합
+
+```
+Anthropic Claude API
+├── Model: claude-3-5-sonnet-20241022
+├── Max Tokens: 4096
+├── Temperature: 0.7
+├── Timeout: 30초
+└── Retries: 3회
 ```
 
 ## 성능 최적화 전략
@@ -338,9 +446,10 @@ GOOGLE_CLIENT_SECRET=
 ### 프론트엔드
 
 - React Server Components로 JS 번들 감소
-- Image 최적화 (next/image)
+- Image 최적화 (next/image, sharp)
 - 동적 import로 코드 분할
 - TanStack Query 캐싱
+- OCR Worker 기반 비동기 처리
 
 ### 백엔드
 
@@ -348,6 +457,14 @@ GOOGLE_CLIENT_SECRET=
 - API 캐싱 전략
 - 데이터베이스 인덱싱
 - Connection pooling
+- AI 요청 배치 처리
+
+### AI 서비스
+
+- 요청 타임아웃 (30초)
+- 자동 재시도 (최대 3회)
+- 결과 캐싱 (DB 저장)
+- 스트리밍 응답 고려
 
 ### 빌드
 
@@ -359,10 +476,11 @@ GOOGLE_CLIENT_SECRET=
 
 ### 인증
 
-- JWT 세션 (30일 유크)
-- bcryptjs 비밀번호 해싱
+- JWT 세션 (30일 유효)
+- bcryptjs 비밀번호 해싱 (salt rounds: 10)
 - CSRF 보호
-- 세션 쿠키 (httpOnly, secure)
+- 세션 쿠키 (httpOnly, secure, sameSite)
+- 인증 미들웨어
 
 ### 데이터 검증
 
@@ -370,12 +488,21 @@ GOOGLE_CLIENT_SECRET=
 - Magic bytes 파일 검증
 - 이미지 크기 제한 (10MB)
 - SQL Injection 방지 (Prisma)
+- XSS 방지 (React 기본 보호)
+
+### AI 서비스 보안
+
+- API 키 환경 변수 관리
+- 요청 타임아웃 설정
+- 비용 제한 (maxTokens, retries)
+- 민감 정보 로깅 제외
 
 ### 환경 변수
 
 - .env.local 무시 (.gitignore)
 - 비밀 정보 서버 측만 노출
 - API 키 보호
+- .env.example 제공
 
 ## 버전 호환성
 
@@ -387,6 +514,7 @@ GOOGLE_CLIENT_SECRET=
   "react": "^19.0.0",
   "@prisma/client": "^6.0.0",
   "next-auth": "^5.0.0-beta.25",
+  "@anthropic-ai/sdk": "^0.71.2",
   "@tanstack/react-query": "^5.90.17",
   "zod": "^3.25.76",
   "tesseract.js": "^7.0.0"
@@ -395,11 +523,22 @@ GOOGLE_CLIENT_SECRET=
 
 ### Node.js 호환성
 
-- 최소: Node.js 20.0.0
-- 권장: Node.js 20.x LTS
+- 최소: Node.js 22.0.0
+- 권장: Node.js 22.x LTS
+
+### 주요 라이브러리 호환성
+
+| 라이브러리 | 버전 | 호환성 |
+|-----------|------|--------|
+| Next.js | 16.0.0 | React 19+ |
+| React | 19.0.0 | Next.js 16+ |
+| Prisma | 6.0.0 | Node.js 22+ |
+| NextAuth | 5.0.0-beta.25 | Next.js 16+ |
+| Claude SDK | 0.71.2 | Node.js 18+ |
 
 ---
 
-버전: 1.0.0
-최종 업데이트: 2026-01-15
+버전: 1.1.0
+최종 업데이트: 2026-01-16
 프레임워크: Next.js 16.0.0 + React 19.0.0
+AI 모델: claude-3-5-sonnet-20241022

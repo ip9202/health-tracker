@@ -6,12 +6,42 @@
 
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { UploadSection } from './upload/upload-section'
 import { ChartContainer } from './charts/chart-container'
 import { HistoryList } from './history/history-list'
+import { InBodyResultCard } from './result/inbody-result-card'
+import { fetchInBodyHistory } from '@/lib/api/inbody-api'
+import type { InBodyData } from '@/lib/types/inbody'
 
 export function InBodyDashboard() {
+  const [latestData, setLatestData] = useState<InBodyData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // 데이터 리로드 함수
+  const reloadLatestData = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const response = await fetchInBodyHistory({ page: 1, pageSize: 1 })
+
+      if (response.records.length > 0) {
+        const record = response.records[0]
+        setLatestData(record as unknown as InBodyData)
+      }
+    } catch (err) {
+      console.error('Failed to load latest InBody data:', err)
+      setError('데이터를 불러오는데 실패했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    reloadLatestData()
+  }, [])
+
   return (
     <div className="w-full bg-[#f9fafb]">
       {/* 페이지 헤더 */}
@@ -30,9 +60,14 @@ export function InBodyDashboard() {
 
       {/* 대시보드 컨텐츠 영역 */}
       <div className="grid gap-0 md:grid-cols-[736px_1fr] auto-rows-max">
+        {/* InBody 결과 카드 섹션 - 전체 너비 */}
+        <div className="md:col-span-2 px-4 pb-4">
+          <InBodyResultCard data={latestData} isLoading={isLoading} />
+        </div>
+
         {/* 업로드 섹션 */}
         <div className="bg-white border border-[#e5e7eb] rounded-[14px] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6">
-          <UploadSection />
+          <UploadSection onUploadSuccess={reloadLatestData} />
         </div>
 
         {/* 차트 섹션 */}

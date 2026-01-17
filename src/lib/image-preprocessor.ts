@@ -425,39 +425,57 @@ export async function preprocessImage(
   const startTime = Date.now();
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
+  console.log('[Preprocess] 전처리 시작, 옵션:', opts);
+
   let processedCanvas = canvas;
 
   // 1. 그레이스케일
   if (opts.grayscale) {
+    console.log('[Preprocess] 1. 그레이스케일 변환...');
     processedCanvas = await convertToGrayscale(processedCanvas);
   }
 
   // 2. 대비 향상
   if (opts.contrast > 1) {
+    console.log('[Preprocess] 2. 대비 향상 (factor:', opts.contrast, ')');
     processedCanvas = await enhanceContrast(processedCanvas, opts.contrast);
   }
 
   // 3. 노이즈 감소
   if (opts.denoise) {
+    console.log('[Preprocess] 3. 노이즈 감소...');
     processedCanvas = await reduceNoise(processedCanvas);
   }
 
   // 4. 이진화 (선택적)
   if (opts.binarize) {
+    console.log('[Preprocess] 4. 이진화 (threshold:', opts.binarizeThreshold, ')');
     processedCanvas = await binarizeImage(processedCanvas, opts.binarizeThreshold);
   }
 
   // 5. 회전 보정
   if (opts.correctRotation) {
+    console.log('[Preprocess] 5. 회전 감지 및 보정...');
     const rotation = await detectRotation(processedCanvas);
+    console.log('[Preprocess] 감지된 회전각:', rotation.toFixed(2), '도');
     if (Math.abs(rotation) > 1) {
       processedCanvas = await correctRotation(processedCanvas, rotation);
+      console.log('[Preprocess] 회전 보정 완료');
     }
   }
 
   // 6. 품질 평가
+  console.log('[Preprocess] 6. 품질 평가...');
   const metrics = await calculateImageQuality(processedCanvas);
   const processingTimeMs = Date.now() - startTime;
+
+  console.log('[Preprocess] 전처리 완료:', {
+    처리시간: processingTimeMs + 'ms',
+    품질점수: metrics.overallScore.toFixed(1),
+    밝기: metrics.brightness,
+    대비: metrics.contrast,
+    선명도: metrics.sharpness.toFixed(3),
+  });
 
   return {
     processedCanvas,

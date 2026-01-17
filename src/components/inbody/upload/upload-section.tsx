@@ -1,76 +1,97 @@
 /**
  * TAG-FE-003-SECT-001: UploadSection 컴포넌트
  * SPEC: SPEC-FE-004
- * DESCRIPTION: InBody 이미지 업로드 섹션 (Figma 디자인 적용)
+ * DESCRIPTION: InBody 이미지 업로드 섹션 (클라이언트 OCR 방식)
  */
 
 'use client'
 
 import React, { useState, useCallback } from 'react'
 import { Upload } from 'lucide-react'
-import { useInBodyUpload } from '@/lib/hooks/use-inbody'
 import type { UploadStatus } from '@/lib/types/inbody'
+import { extractTextFromImageClient, type ClientOCRResult } from '@/lib/client-ocr'
 
 interface UploadSectionProps {
   uploadingFile?: File
   uploadStatus?: UploadStatus
+  onUploadSuccess?: () => void // 업로드 성공 시 호출될 콜백
 }
 
-export function UploadSection({ uploadingFile: externalFile, uploadStatus: externalStatus }: UploadSectionProps = {}) {
+export function UploadSection({ uploadingFile: externalFile, uploadStatus: externalStatus, onUploadSuccess }: UploadSectionProps = {}) {
   const [internalFile, setInternalFile] = useState<File | null>(null)
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle')
   const [progress, setProgress] = useState(0)
+  const [ocrStatus, setOcrStatus] = useState<string>('')
   const [message, setMessage] = useState<string>()
   const [error, setError] = useState<string>()
-
-  const uploadMutation = useInBodyUpload({
-    onSuccess: (data) => {
-      setUploadStatus('success')
-      setProgress(100)
-      setMessage(data.data ? 'Data extracted successfully.' : 'Upload complete!')
-    },
-    onError: (err) => {
-      setUploadStatus('error')
-      setError(err.message || 'Upload failed.')
-      setMessage('Upload failed')
-    },
-  })
 
   const file = externalFile || internalFile
   const status = externalStatus || uploadStatus
 
-  const handleFileSelect = useCallback((selectedFile: File) => {
+  const handleFileSelect = useCallback(async (selectedFile: File) => {
     setInternalFile(selectedFile)
     setUploadStatus('uploading')
     setProgress(0)
+    setOcrStatus('OCR 준비 중...')
     setMessage(undefined)
     setError(undefined)
 
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(progressInterval)
-          return 90
-        }
-        return prev + 10
-      })
-    }, 200)
+    try {
+      console.log('[OCR Upload] 이미지 OCR 시작:', selectedFile.name)
+      setProgress(10)
+      setOcrStatus('이미지 전처리 중...')
 
-    uploadMutation.mutate(selectedFile, {
-      onSuccess: () => {
-        clearInterval(progressInterval)
-        setProgress(100)
-        setUploadStatus('processing')
-        setTimeout(() => {
-          setUploadStatus('success')
-        }, 1000)
-      },
-      onError: () => {
-        clearInterval(progressInterval)
-        setUploadStatus('error')
-      },
-    })
-  }, [uploadMutation])
+      // 클라이언트 OCR 실행
+      const ocrResult: ClientOCRResult = await extractTextFromImageClient(selectedFile, {
+        language: 'kor+eng',
+        preprocess: false, // 전처리 끔 (텍스트 손상 방지)
+        onProgress: (progress) => {
+          const progressPercent = Math.round(progress.progress * 100)
+          setProgress(10 + progressPercent * 0.7) // 10-80%
+          setOcrStatus(`OCR 진행 중... ${progressPercent}%`)
+        },
+      })
+
+      console.log('[OCR Upload] OCR 완료, 신뢰도:', ocrResult.confidence)
+      setProgress(85)
+      setOcrStatus('데이터 추출 중...')
+
+      // OCR 텍스트를 서버로 전송
+      const response = await fetch('/api/inbody/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ocrText: ocrResult.text,
+          ocrConfidence: ocrResult.confidence,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || '데이터 추출 실패')
+      }
+
+      const data = await response.json()
+
+      // 성공
+      setProgress(100)
+      setUploadStatus('success')
+      setMessage(`OCR 완료! (신뢰도: ${ocrResult.confidence.toFixed(1)}%) 데이터가 저장되었습니다.`)
+      console.log('[OCR Upload] 성공:', data)
+
+      // 대시보드 데이터 갱신 콜백 호출
+      if (onUploadSuccess) {
+        onUploadSuccess()
+      }
+
+    } catch (err) {
+      console.error('[OCR Upload] 실패:', err)
+      setUploadStatus('error')
+      setError(err instanceof Error ? err.message : 'OCR 처리 실패')
+    }
+  }, [])
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -100,7 +121,7 @@ export function UploadSection({ uploadingFile: externalFile, uploadStatus: exter
           Image Upload
         </h3>
         <p className="text-[16px] font-normal leading-6 tracking-[-0.31px] text-[#717182] font-['Inter',sans-serif]">
-          Upload your InBody result sheet to extract data.
+          Upload your InBody result sheet for AI analysis.
         </p>
       </div>
 
@@ -158,7 +179,7 @@ export function UploadSection({ uploadingFile: externalFile, uploadStatus: exter
                 </div>
               </div>
               <p className="text-[14px] font-medium text-[#6a7282]">
-                Uploading... {progress}%
+                {ocrStatus || `처리 중... ${progress}%`}
               </p>
             </>
           )}

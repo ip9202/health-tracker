@@ -160,7 +160,7 @@ export function parseInBodyData(ocrText: string): ParseResult {
 
   // Priority 1: InBody 770 표준 형식
   // "신체 점수"와 "표준" 사이의 모든 숫자 중 가장 큰 값 사용 (0-100 범위)
-  const p1Match = text.match(/신체\s*점수[^표준]*?표준/);
+  const p1Match = text.match(/신체\s*점수.*?표준/);
   if (p1Match) {
     const scoreText = p1Match[0];
     const allNumbers = scoreText.match(/(\d+\.?\d*)/g);
@@ -324,11 +324,19 @@ export function parseInBodyData(ocrText: string): ParseResult {
     }
   }
 
-  // 패턴 3: "/100포인트" 앞의 숫자 찾기
+  // 패턴 3: "81/100포인트" 형식에서 분자 숫자 찾기 (우선순위 높임)
   if (!bodyScoreValue) {
-    const pointScoreMatch = text.match(/\/\s*(\d+)\s*\/?\s*100\s*포인트/);
+    const pointScoreMatch = text.match(/(\d+)\s*\/\s*100\s*포인트/);
     if (pointScoreMatch) {
       bodyScoreValue = parseInt(pointScoreMatch[1], 10);
+    }
+  }
+
+  // 패턴 3-2: "81/100" 형식 (포인트 없음)
+  if (!bodyScoreValue) {
+    const simpleScoreMatch = text.match(/(\d+)\s*\/\s*100\s*(?:점|점수)?/);
+    if (simpleScoreMatch) {
+      bodyScoreValue = parseInt(simpleScoreMatch[1], 10);
     }
   }
 

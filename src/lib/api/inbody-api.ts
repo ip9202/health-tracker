@@ -7,9 +7,41 @@
 import type { UploadResponse, HistoryResponse, DateRangeFilter } from '@/lib/types/inbody'
 
 /**
- * InBody 이미지 업로드
+ * 클라이언트 OCR 결과와 함께 InBody 데이터 업로드
+ * @param ocrText OCR로 추출된 텍스트
+ * @param ocrConfidence OCR 신뢰도
+ * @returns 업로드 결과
+ */
+export async function uploadInBodyDataWithOCR(
+  ocrText: string,
+  ocrConfidence: number,
+): Promise<UploadResponse> {
+  const response = await fetch('/api/inbody/upload', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ocrText,
+      ocrConfidence,
+    }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Upload failed' }))
+    return {
+      success: false,
+      error: errorData.error || `Upload failed with status ${response.status}`,
+    }
+  }
+
+  return response.json()
+}
+
+/**
+ * InBody 이미지 업로드 (레거시 - 더미 데이터용)
  * @param file 업로드할 이미지 파일
- * @returns 업로드 결과 및 OCR 처리 데이터
+ * @returns 업로드 결과
  */
 export async function uploadInBodyImage(file: File): Promise<UploadResponse> {
   const formData = new FormData()

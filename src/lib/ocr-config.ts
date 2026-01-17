@@ -92,7 +92,7 @@ const QUALITY_SCORES = {
   BASE: 40, // 기본 점수
   MAX: 100, // 최대 점수
   MIN: 0, // 최소 점수
-} as const
+}
 
 /**
  * 해상도별 점수 보정

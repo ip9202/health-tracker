@@ -104,7 +104,7 @@ const ExtractionAttemptSchema = z.object({
 const PatternDefinitionSchema = z.object({
   id: z.string().min(1, 'id는 비워둘 수 없습니다'),
   name: z.string().min(1, 'name은 비워둘 수 없습니다'),
-  regex: z.instanceof(RegExp, 'regex는 RegExp 인스턴스여야 합니다'),
+  regex: z.instanceof(RegExp),
   priority: z.number().int('priority는 정수여야 합니다').min(1, 'priority는 1 이상이어야 합니다').max(10, 'priority는 10 이하여야 합니다'),
   description: z.string().min(1, 'description은 비워둘 수 없습니다'),
   format: z.enum(SUPPORTED_FORMATS, {

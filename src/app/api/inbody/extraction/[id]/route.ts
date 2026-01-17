@@ -41,7 +41,7 @@ function createExtractionResult(record: {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 1. 인증 검증 (SPEC-AUTH-001)
@@ -56,9 +56,12 @@ export async function GET(
 
     const userId = session.user.id;
 
-    // 2. 레코드 조회
+    // 2. params await (Next.js 15+)
+    const { id } = await params;
+
+    // 3. 레코드 조회
     const record = await prisma.inBodyRecord.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     // 3. 레코드 존재 확인

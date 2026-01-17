@@ -8,9 +8,9 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     poolOptions: {
       threads: {
-        singleThread: false,
+        singleThread: true,
         minThreads: 1,
-        maxThreads: 2
+        maxThreads: 1
       }
     },
     // Watch 모드에서 무한 실행 방지 - 파일 변경 시 테스트 자동 재실행만 수행
@@ -23,6 +23,7 @@ export default defineConfig({
       reporter: ['text', 'html', 'json'],
       exclude: [
         'node_modules/',
+        '.next/',
         'src/types/',
         '**/*.d.ts',
         '**/*.config.*',

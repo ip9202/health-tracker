@@ -44,6 +44,7 @@ export interface InBodyData {
   // 기타 지표
   smi?: number
   dailyCalories?: number
+  bioimpedance?: string // 생체임피던스
 
   // 메타데이터
   imagePath: string
@@ -54,16 +55,52 @@ export interface InBodyData {
 
 /**
  * 차트 및 리스트 표시용 간소화된 InBody 레코드
+ * InBodyData의 필드명과 일치하도록 수정
  */
 export interface InBodyRecord {
   id: string
+  userId: string
   measuredAt: Date
+
+  // 개인정보
+  name?: string
+  gender?: string
+  age?: number
+  height?: number
+
+  // 체성분 데이터
   weight?: number
-  bodyFat?: number
+  bodyFatPercentage?: number // bodyFat -> bodyFatPercentage 로 변경
   muscle?: number
+  protein?: number
+  bodyWater?: number
   skeletalMuscle?: number
+
+  // 신체 점수
   bodyScore?: number
+  scoreDescription?: string
+
+  // 비만 판정
   bmi?: number
+  bmiStatus?: string
+
+  // 체중 조절
+  weightControl?: string
+
+  // 신체 유형
+  bodyType?: string
+
+  // 기타 지표
+  smi?: number
+  calorieNeeds?: number
+  bioimpedance?: string
+
+  // OCR 메타데이터
+  ocrConfidence?: number
+
+  // 메타데이터
+  createdAt: Date
+  updatedAt: Date
 }
 
 /**
@@ -126,4 +163,56 @@ export interface ChartDataPoint {
 export interface MultiLineChartDataPoint {
   date: string
   [key: string]: string | number
+}
+
+/**
+ * TASK-009: 추출 상세 정보 응답 타입
+ * GET /api/inbody/extraction/[id] API 응답
+ */
+export interface ExtractionDetailResponse {
+  success: boolean
+  data: {
+    id: string
+    extractionResult: {
+      attempts: Array<{
+        patternId: string
+        patternName: string
+        matchedText: string
+        extractedValue: string
+        confidence: number
+        timestamp: string
+      }>
+      confidence: number
+      processingTimeMs: number
+      timestamp: string
+    }
+  }
+}
+
+/**
+ * TASK-009: 재시도 추출 응답 타입
+ * POST /api/inbody/retry-extraction/[id] API 응답
+ */
+export interface RetryExtractionResponse {
+  success: boolean
+  data?: {
+    id: string
+    extractionResult: {
+      attempts: Array<{
+        patternId: string
+        patternName: string
+        matchedText: string
+        extractedValue: string
+        confidence: number
+        timestamp: string
+      }>
+      confidence: number
+      processingTimeMs: number
+      timestamp: string
+    }
+    retryCount: number
+    enhancedLevel: number
+  }
+  error?: string
+  errorCode?: string
 }

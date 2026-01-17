@@ -73,7 +73,7 @@ function calculateImprovedConfidence(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 1. 인증 검증 (SPEC-AUTH-001)
@@ -88,7 +88,10 @@ export async function POST(
 
     const userId = session.user.id;
 
-    // 2. 요청 바디 파싱
+    // 2. params await (Next.js 15+)
+    const { id } = await params;
+
+    // 3. 요청 바디 파싱
     let body: RetryRequestBody;
     try {
       body = await parseRequestBody(request);
@@ -102,7 +105,7 @@ export async function POST(
 
     const retryCount = body.retryCount || 0;
 
-    // 3. 최대 재시도 횟수 확인
+    // 4. 최대 재시도 횟수 확인
     if (retryCount >= MAX_RETRY_COUNT) {
       const errorResponse: ApiErrorResponse = {
         error: '최대 재시도 횟수를 초과했습니다',
@@ -111,9 +114,9 @@ export async function POST(
       return NextResponse.json(errorResponse, { status: 400 });
     }
 
-    // 4. 레코드 조회
+    // 5. 레코드 조회
     const record = await prisma.inBodyRecord.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     // 5. 레코드 존재 확인
@@ -145,7 +148,7 @@ export async function POST(
 
     // 9. 레코드 업데이트
     const updatedRecord = await prisma.inBodyRecord.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ocrConfidence: improvedConfidence,
         updatedAt: new Date(),
