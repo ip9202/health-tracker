@@ -41,11 +41,15 @@ health/
 │   │   │   │   └── signout/route.ts
 │   │   │   ├── inbody/            # InBody API
 │   │   │   │   ├── upload/route.ts
-│   │   │   │   ├── history/route.ts
-│   │   │   │   └── [id]/route.ts
-│   │   │   └── health/            # AI 건강 분석 API (NEW)
-│   │   │       ├── analyze/[recordId]/route.ts
-│   │   │       └── analysis/[recordId]/route.ts
+│   │   │   ├── hybrid-upload/route.ts # 하이브리드 OCR + AI (NEW)
+│   │   │   ├── vision-upload/route.ts  # Vision API 직접 추출 (NEW)
+│   │   │   ├── extraction/[id]/route.ts # 추출 결과 조회 (NEW)
+│   │   │   ├── retry-extraction/[id]/route.ts # 재시도 (NEW)
+│   │   │   ├── history/route.ts
+│   │   │   └── [id]/route.ts
+│   │   └── health/            # AI 건강 분석 API (NEW)
+│   │       ├── analyze/[recordId]/route.ts
+│   │       └── analysis/[recordId]/route.ts
 │   │   ├── auth/                  # 인증 페이지
 │   │   │   ├── signin/page.tsx
 │   │   │   └── signup/page.tsx
@@ -96,17 +100,23 @@ health/
 │   │   │   └── health-analysis.ts
 │   │   ├── types/                 # TypeScript 타입
 │   │   │   ├── inbody.ts
+│   │   │   ├── extraction/         # OCR 추출 타입 (NEW)
+│   │   │   │   └── extraction.ts
 │   │   │   └── index.ts
 │   │   ├── auth.ts                # NextAuth 설정
 │   │   ├── ai-service.ts          # AI 건강 분석 서비스 (NEW)
 │   │   ├── ai-schemas.ts          # AI Zod 스키마 (NEW)
 │   │   ├── client-ocr.ts          # 클라이언트 OCR (NEW)
+│   │   ├── multi-stage-extractor.ts # 멀티 스테이지 추출 (NEW)
+│   │   ├── extraction-error-handler.ts # OCR 오류 처리 (NEW)
 │   │   ├── ocr-service.ts         # Tesseract.js OCR
 │   │   ├── parser-service.ts      # OCR 데이터 파싱
 │   │   ├── password.ts            # 비밀번호 해싱
 │   │   ├── prisma.ts              # Prisma 클라이언트
 │   │   ├── validations.ts         # Zod 검증 스키마
 │   │   ├── inbody.ts              # InBody 타입 정의
+│   │   ├── ocr-config.ts          # OCR 설정 (NEW)
+│   │   ├── pattern-library.ts     # 정규식 패턴 라이브러리 (NEW)
 │   │   └── image-validator.ts     # 이미지 검증
 │   ├── middleware.ts              # NextAuth 인증 미들웨어
 │   └── styles/                    # 스타일시트
@@ -141,6 +151,10 @@ health/
 **InBody API** (`api/inbody/`)
 
 - `upload/route.ts`: 이미지 업로드 및 OCR 처리
+- `hybrid-upload/route.ts`: 하이브리드 OCR + AI 추출 (NEW)
+- `vision-upload/route.ts`: Vision API 직접 추출 (NEW)
+- `extraction/[id]/route.ts`: 추출 결과 조회 (NEW)
+- `retry-extraction/[id]/route.ts`: 추출 재시도 (NEW)
 - `history/route.ts`: 기록 목록 조회 (페이지네이션)
 - `[id]/route.ts`: 특정 기록 삭제
 
@@ -229,12 +243,16 @@ health/
 - `ai-service.ts`: AI 건강 분석 서비스 (NEW)
 - `ai-schemas.ts`: AI 관련 Zod 스키마 (NEW)
 - `client-ocr.ts`: 클라이언트 측 OCR 처리 (NEW)
+- `multi-stage-extractor.ts`: 멀티 스테이지 추출 시스템 (NEW)
+- `extraction-error-handler.ts`: OCR 오류 처리 및 재시도 (NEW)
 - `ocr-service.ts`: Tesseract.js OCR 처리
 - `parser-service.ts`: OCR 데이터 파싱
 - `password.ts`: 비밀번호 해싱
 - `prisma.ts`: Prisma 클라이언트
 - `validations.ts`: Zod 검증 스키마
 - `inbody.ts`: InBody 타입 정의
+- `ocr-config.ts`: OCR 설정 및 전처리 (NEW)
+- `pattern-library.ts`: 정규식 패턴 라이브러리 (NEW)
 - `image-validator.ts`: 이미지 검증
 
 ### `prisma/` - 데이터베이스 스키마
@@ -269,6 +287,10 @@ Vitest를 사용하는 테스트 코드가 포함됩니다.
 | `/api/auth/signup` | POST | 회원가입 | - |
 | `/api/auth/signout` | POST | 로그아웃 | - |
 | `/api/inbody/upload` | POST | InBody 업로드 + OCR | Yes |
+| `/api/inbody/hybrid-upload` | POST | 하이브리드 OCR + AI 추출 | Yes (NEW) |
+| `/api/inbody/vision-upload` | POST | Vision API 직접 추출 | Yes (NEW) |
+| `/api/inbody/extraction/[id]` | GET | 추출 결과 조회 | Yes (NEW) |
+| `/api/inbody/retry-extraction/[id]` | POST | 추출 재시도 | Yes (NEW) |
 | `/api/inbody/history` | GET | 기록 목록 (페이지네이션) | Yes |
 | `/api/inbody/[id]` | DELETE | 기록 삭제 | Yes |
 | `/api/health/analyze/[recordId]` | POST | AI 분석 요청 | Yes |
@@ -459,7 +481,8 @@ model HealthAnalysis {
 
 ---
 
-버전: 1.1.0
-최종 업데이트: 2026-01-16
+버전: 1.2.0
+최종 업데이트: 2026-01-17
 프레임워크: Next.js 16.0.0 App Router
 AI 모델: claude-3-5-sonnet-20241022
+OCR 정확도: 95% (멀티 스테이지 추출)
