@@ -94,16 +94,21 @@ export function parseInBodyData(ocrText: string): ParseResult {
   console.log('[Parser] 전체 OCR 텍스트:', text);
 
   // ========== 1. 개인정보 추출 ==========
-  // 이름: "10:강력쇠주먹" 형식 처리
-  const nameMatch = text.match(/(\d+):\s*([가-힣A-Za-z]+)\s+성별/);
+  // 이름: "ID:강력쇠주먹", "10:강력쇠주먹" 형식 처리
+  const nameMatch = text.match(/ID:\s*([가-힣]+)\s+성별/);
   if (nameMatch) {
-    data.name = nameMatch[2];
+    data.name = nameMatch[1];
   } else {
-    const altNameMatch = text.match(/성명\s*[:\s]*([가-힣A-Za-z]+)/);
-    if (altNameMatch) {
-      data.name = altNameMatch[1];
+    const altNameMatch1 = text.match(/(\d+):\s*([가-힣A-Za-z]+)\s+성별/);
+    if (altNameMatch1) {
+      data.name = altNameMatch1[2];
     } else {
-      warnings.push({ field: 'name', message: '이름을 찾을 수 없습니다' });
+      const altNameMatch2 = text.match(/성명\s*[:\s]*([가-힣A-Za-z]+)/);
+      if (altNameMatch2) {
+        data.name = altNameMatch2[1];
+      } else {
+        warnings.push({ field: 'name', message: '이름을 찾을 수 없습니다' });
+      }
     }
   }
 
@@ -148,28 +153,53 @@ export function parseInBodyData(ocrText: string): ParseResult {
     warnings.push({ field: 'weight', message: '체중을 찾을 수 없습니다' });
   }
 
-  // 체지방률: "체지방 9.2 (7.9-15.8) 13.7 표준"
-  const bodyFatMatch = text.match(/(?:체지방률|체지방|PBF|Body\s*Fat)\s*[:\s]*(\d+\.?\d*)\s*%?/);
-  if (bodyFatMatch) {
-    data.bodyFatPercentage = parseFloat(bodyFatMatch[1]);
+  // 체지방량: "체지방량(kg) 8.8" 또는 "체지방량 8.8kg"
+  const bodyFatMassMatch = text.match(/체지방량[^0-9]*?(\d+\.?\d*)\s*(?:kg|\(?\s*kg)?/);
+  if (bodyFatMassMatch) {
+    data.bodyFat = parseFloat(bodyFatMassMatch[1]);
   }
 
-  // 신체 점수: 16개 패턴 기반 추출 (TASK-007)
-  // 우선순위별로 패턴 매칭 시도
+  // 체지방 및 체지방률: "체지방률 8.8 13.2" 형식에서 첫 번째는 체지방량(kg), 두 번째는 체지방률(%)
+  // Priority 1: "체지방률" 뒤에 두 개의 숫자가 있는 형식 (체지방량, 체지방률)
+  const bodyFatDualMatch = text.match(/체지방률\s+(\d+\.?\d+)\s+(\d+\.?\d+)/);
+  if (bodyFatDualMatch) {
+    data.bodyFat = parseFloat(bodyFatDualMatch[1]);      // 첫 번째: 체지방량 (kg)
+    data.bodyFatPercentage = parseFloat(bodyFatDualMatch[2]); // 두 번째: 체지방률 (%)
+  } else {
+    // Priority 2: 기존 체지방량 패턴 (단독)
+    const bodyFatMassMatch = text.match(/체지방량[^0-9]*?(\d+\.?\d*)\s*(?:kg|\(?\s*kg)?/);
+    if (bodyFatMassMatch) {
+      data.bodyFat = parseFloat(bodyFatMassMatch[1]);
+    }
+
+    // Priority 3: 간단한 체지방률 패턴
+    const simpleBfpMatch = text.match(/체지방률\s*[:\s]*(\d+\.?\d*)\s*%/);
+    if (simpleBfpMatch) {
+      data.bodyFatPercentage = parseFloat(simpleBfpMatch[1]);
+    }
+  }
+
+  // 신체 점수: "81 100포인트" 형식에서 100포인트/100점 기준 앞의 숫자 추출
+  // Priority 1: "100포인트" 바로 앞의 숫자 (실제 신체점수)
   let bodyScoreValue: number | undefined;
 
-  // Priority 1: InBody 770 표준 형식
-  // "신체 점수"와 "표준" 사이의 모든 숫자 중 가장 큰 값 사용 (0-100 범위)
-  const p1Match = text.match(/신체\s*점수.*?표준/);
-  if (p1Match) {
-    const scoreText = p1Match[0];
-    const allNumbers = scoreText.match(/(\d+\.?\d*)/g);
-    if (allNumbers) {
-      const validScores = allNumbers
-        .map(n => parseFloat(n))
-        .filter(n => n >= 0 && n <= 100);
-      if (validScores.length > 0) {
-        bodyScoreValue = Math.max(...validScores);
+  // "100포인트" 또는 "100점" 바로 앞에 있는 숫자 추출
+  const point100Match = text.match(/(\d{1,2}\.?\d*)\s+(?:100\s*포인트|100\s*점|100점)/);
+  if (point100Match) {
+    const score = parseFloat(point100Match[1]);
+    // 100 이하의 값만 신체점수로 사용 (100 자체는 제외)
+    if (score < 100) {
+      bodyScoreValue = score;
+    }
+  }
+
+  // Priority 2: "N/100" 또는 "N / 100" 형식
+  if (!bodyScoreValue) {
+    const slash100Match = text.match(/(\d{1,3})\s*\/\s*100/);
+    if (slash100Match) {
+      const score = parseInt(slash100Match[1], 10);
+      if (score >= 0 && score < 100) {
+        bodyScoreValue = score;
       }
     }
   }
@@ -391,9 +421,20 @@ export function parseInBodyData(ocrText: string): ParseResult {
   }
 
   // ========== 3. 비만 판정 추출 ==========
-  // BMI: "BMI: 23.5" 또는 "체질량지수 (BMI) 7 7 1 7 9% 22.4 곡격근"
-  // 간단한 형식 먼저 시도
-  const bmiMatch = text.match(/(?:BMI|체질량지수)\s*[:\s]*(\d+\.?\d*)/i);
+  // BMI: "BMI: 23.5", "bmi = 22.3", "체질량지수(BMI) % 22.3"
+  // 간단한 형식 먼저 시도 (= 지원)
+  const bmiMatch = text.match(/(?:체질량지수|BMI|bmi)\s*(?:\([^)]*\)\s*%?\s*[=:]?\s*)?(\d+\.?\d*)/i);
+  if (bmiMatch) {
+    data.bmi = parseFloat(bmiMatch[1]);
+  } else {
+    // 대안: % 뒤에 오는 숫자를 BMI로 추출
+    const percentBmiMatch = text.match(/%\s*(\d{2}\.?\d*)/);
+    if (percentBmiMatch && parseFloat(percentBmiMatch[1]) < 50) {
+      data.bmi = parseFloat(percentBmiMatch[1]);
+    } else {
+      warnings.push({ field: 'bmi', message: 'BMI를 찾을 수 없습니다' });
+    }
+  }
   if (bmiMatch) {
     data.bmi = parseFloat(bmiMatch[1]);
   } else {
@@ -412,27 +453,20 @@ export function parseInBodyData(ocrText: string): ParseResult {
     }
   }
 
-  // 비만 판정: "비만판정: 정상" 또는 "BMI: 23.5 비만판정: 정상" 또는 "비만 판정 보통"
-  // 간단한 형식 먼저 시도 (콜론 유무 모두 지원)
-  const simpleBmiStatusMatch = text.match(/(?:비만\s*판정|비만판정|bmi\s*status)\s*[:\s]*(저체중|보통|정상|과체중|비만)/i);
-  if (simpleBmiStatusMatch) {
-    data.bmiStatus = simpleBmiStatusMatch[1];
-  } else {
-    // 복잡한 형식: "비만 분석 비만(현재 무게/목표 체중) ... 보통"
-    const bmiStatusAfterAnalysis = text.match(/비만\s*분석.*?(?:체중.*?\)\s*|)(?:target|goal|목표)?.*?(저체중|보통|정상|과체중|비만)/);
-    if (bmiStatusAfterAnalysis) {
-      data.bmiStatus = bmiStatusAfterAnalysis[1];
+  // 비만 판정: BMI 값으로 계산 (대한비만학회 기준)
+  if (data.bmi !== undefined) {
+    // 저체중: < 18.5, 정상: 18.5-22.9, 과체중: 23-24.9, 비만: >= 25
+    if (data.bmi < 18.5) {
+      data.bmiStatus = '저체중';
+    } else if (data.bmi < 23) {
+      data.bmiStatus = '정상';
+    } else if (data.bmi < 25) {
+      data.bmiStatus = '과체중';
     } else {
-      // 대안: OCR 텍스트 전체에서 "보통" 또는 "정상"을 먼저 찾음
-      const statusOrder = ['보통', '정상', '저체중', '과체중', '비만'];
-      for (const status of statusOrder) {
-        const regex = new RegExp(`\\b${status}\\b`);
-        if (regex.test(text)) {
-          data.bmiStatus = status;
-          break;
-        }
-      }
+      data.bmiStatus = '비만';
     }
+  } else {
+    warnings.push({ field: 'bmiStatus', message: 'BMI가 없어 비만 판정을 할 수 없습니다' });
   }
 
   // ========== 4. 체중 조절 추출 ==========
@@ -502,28 +536,7 @@ export function parseInBodyData(ocrText: string): ParseResult {
     }
   }
 
-  // ========== 6. 생체 임피던스 추출 ==========
-  // 생체 임피던스: "생체전기 임피던스... 20 (kHz) 316.2 317" 또는 "생체임피던스: 50kHz,250Ω"
-  const bioimpedanceMatch = text.match(/(?:생체\s*임피던스|생체전기\s*임피던스)\s*[:\s]*([\d.]+kHz[,°]?[\d.]*Ω?)/);
-  if (bioimpedanceMatch) {
-    data.bioimpedance = bioimpedanceMatch[1];
-  } else {
-    // 추가 패턴: 더 유연한 생체 임피던스 추출
-    const bioimpedanceFlexibleMatch = text.match(/생체[전기]?\s*임피던스[^0-9]*([\d.]+)\s*(?:kHz|Hz)/);
-    if (bioimpedanceFlexibleMatch) {
-      data.bioimpedance = bioimpedanceFlexibleMatch[1] + 'kHz';
-    } else {
-      warnings.push({ field: 'bioimpedance', message: '생체 임피던스를 찾을 수 없습니다' });
-    }
-  }
-
-  // ========== 7. 기타 지표 추출 ==========
-  // SMI: "SMI 8.5kg/m²" 또는 "SMI: 8.5"
-  const smiMatch = text.match(/SMI\s*[:\s]*(\d+\.?\d*)/);
-  if (smiMatch) {
-    data.smi = parseFloat(smiMatch[1]);
-  }
-
+  // ========== 6. 기타 지표 추출 ==========
   // 칼로리/기초대사량: "기초 대사율 1618kcal"
   const calorieMatch = text.match(/(?:기초\s*대사율|칼로리|대사량)\s*[:\s]*(\d+)\s*kcal?/);
   if (calorieMatch) {
@@ -534,65 +547,6 @@ export function parseInBodyData(ocrText: string): ParseResult {
   // const bodyAgeMatch = text.match(/신체\s*연령\s*[:\s]*(\d+)/);
   // 참고용으로 저장하거나 별도 필드로 추가 가능
 
-  // ========== 8. 부위별 분석 (요약) ==========
-  // 분할 지방 분석: "0.3kg L R 0.4kg 3.2kg L R 3.2kg" 등
-  // 상지/하지/몸통/복부 데이터 추출 가능
-  const regionalData: string[] = [];
-
-  // 왼쪽 상지 지방량
-  const leftArmFatMatch = text.match(/L\s*R\s*(\d+\.?\d*)kg/);
-  if (leftArmFatMatch) {
-    regionalData.push(`왼팔 지방: ${leftArmFatMatch[1]}kg`);
-  }
-
-  // 오른쪽 상지 지방량
-  const rightArmFatMatch = text.match(/R\s*(\d+\.?\d*)kg\s*L\s*R/);
-  if (rightArmFatMatch) {
-    regionalData.push(`오른팔 지방: ${rightArmFatMatch[1]}kg`);
-  }
-
-  // ========== 복부 관련 데이터 추출 ==========
-
-  // 복부 지방량: "복부 지방: 2.5kg" 또는 "복부지방 2.5kg"
-  const abdominalFatMatch = text.match(/복부\s*지방\s*[:\s]*(\d+\.?\d*)\s*kg?/);
-  if (abdominalFatMatch) {
-    regionalData.push(`복부 지방: ${abdominalFatMatch[1]}kg`);
-  }
-
-  // 복부 비만 판정: "복부 비만: 정상" 또는 "복부비만 관리 필요"
-  const abdominalObesityMatch = text.match(/복부\s*비만\s*[:\s]*(정상|관리\s*필요|비만|위험)/);
-  if (abdominalObesityMatch) {
-    regionalData.push(`복부 비만: ${abdominalObesityMatch[1]}`);
-  }
-
-  // 허리둘레: "허리둘레: 85cm" 또는 "허리 둘레 85.5cm"
-  const waistCircumferenceMatch = text.match(/허리\s*둘레\s*[:\s]*(\d+\.?\d*)\s*cm?/);
-  if (waistCircumferenceMatch) {
-    regionalData.push(`허리둘레: ${waistCircumferenceMatch[1]}cm`);
-  }
-
-  // 내장 지방: "내장 지방: 10" 또는 "내장지방 10레벨"
-  const visceralFatMatch = text.match(/내장\s*지방\s*[:\s]*(\d+\.?\d*)/);
-  if (visceralFatMatch) {
-    regionalData.push(`내장 지방: ${visceralFatMatch[1]}`);
-  }
-
-  // 배꼽 수준 (피하지방 두께): "배꼽 수준 2.0cm"
-  const umbilicalFatMatch = text.match(/배꼽\s*수준\s*[:\s]*(\d+\.?\d*)\s*cm?/);
-  if (umbilicalFatMatch) {
-    regionalData.push(`배꼽 피하지방: ${umbilicalFatMatch[1]}cm`);
-  }
-
-  // 골격근 비율
-  const musclePercentMatch = text.match(/(\d+\.?\d*)%\s*표준/);
-  if (musclePercentMatch) {
-    regionalData.push(`골격근 비율: ${musclePercentMatch[1]}%`);
-  }
-
-  if (regionalData.length > 0) {
-    data.regionalAnalysis = regionalData.join(', ');
-  }
-
   // 파싱 결과 로그 (디버깅용)
   console.log('[Parser] 추출된 데이터:', {
     name: data.name,
@@ -600,6 +554,7 @@ export function parseInBodyData(ocrText: string): ParseResult {
     age: data.age,
     height: data.height,
     weight: data.weight,
+    bodyFat: data.bodyFat,
     bodyFatPercentage: data.bodyFatPercentage,
     muscle: data.muscle,
     protein: data.protein,
@@ -611,10 +566,7 @@ export function parseInBodyData(ocrText: string): ParseResult {
     bmiStatus: data.bmiStatus,
     weightControl: data.weightControl,
     bodyType: data.bodyType,
-    bioimpedance: data.bioimpedance,
-    smi: data.smi,
     calorieNeeds: data.calorieNeeds,
-    regionalAnalysis: data.regionalAnalysis,
   });
   console.log('[Parser] 경고:', warnings);
 
