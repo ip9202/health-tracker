@@ -42,12 +42,39 @@ const config: Config = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
+        },
+        // InBody Brand Colors (SPEC-FE-006)
+        inbody: {
+          blue: '#0066CC',
+          green: '#22C55E',
+          orange: '#F97316',
+          'blue-light': '#3385DB',
+          'green-light': '#4ADE80',
+          'orange-light': '#FB923C',
         }
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)'
+      },
+      fontFamily: {
+        sans: [
+          'var(--font-pretendard)',
+          'Inter',
+          'system-ui',
+          'sans-serif'
+        ],
+        mono: [
+          'var(--font-roboto-mono)',
+          'monospace'
+        ]
+      },
+      spacing: {
+        '18': '4.5rem',   // 72px
+        '22': '5.5rem',   // 88px
+        '26': '6.5rem',   // 104px
+        '30': '7.5rem',   // 120px
       }
     }
   },

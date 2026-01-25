@@ -1,14 +1,21 @@
 /**
- * TAG-FE-001-GAM-002: Achievement Badges Component
- * SPEC: SPEC-FE-004
- * DESCRIPTION: InBody 마일스톤 업적 배지 (게이미피케이션) 컴포넌트
+ * TAG-FE-013-GAM-002: Achievement Badges Component
+ * SPEC: SPEC-FE-006 (Complete Redesign)
+ * DESCRIPTION: InBody 마일스톤 업적 배지 - InBody 색상 시스템 적용
+ *
+ * Design System (SPEC-FE-006):
+ * - 스페셜(특수): Purple (#9333EA)
+ * - 점수: Yellow (#F59E0B)
+ * - 근육: Green (#22C55E)
+ * - 체지방: Orange (#F97316)
+ * - 체중: Blue (#0066CC)
+ * - 스트릭: Red/Orange (#EF4444)
  */
 
 'use client'
 
 import React from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Lock, Trophy, Star, Medal, Award, Crown, Sparkles } from 'lucide-react'
 
 export interface Achievement {
   id: string
@@ -27,82 +34,103 @@ export interface AchievementBadgesProps {
 }
 
 /**
- * Achievement icon component
+ * 카테고리별 색상 시스템 (InBody Design System)
+ */
+function getCategoryColors(category: Achievement['category']) {
+  const colors = {
+    streak: { bg: '#FED7AA', border: '#F97316', iconBg: '#FFEDD5', text: '#9A3412' },
+    weight: { bg: '#DBEAFE', border: '#0066CC', iconBg: '#EFF6FF', text: '#1E40AF' },
+    muscle: { bg: '#DCFCE7', border: '#22C55E', iconBg: '#F0FDF4', text: '#166534' },
+    fat: { bg: '#FEE2E2', border: '#EF4444', iconBg: '#FEF2F2', text: '#991B1B' },
+    score: { bg: '#FEF3C7', border: '#F59E0B', iconBg: '#FFFBEB', text: '#92400E' },
+    special: { bg: '#F3E8FF', border: '#9333EA', iconBg: '#FAF5FF', text: '#6B21A8' },
+  }
+  return colors[category]
+}
+
+/**
+ * Achievement Icon Component
  */
 function AchievementIcon({ achievement }: { achievement: Achievement }) {
-  const iconMap: Record<string, React.ReactNode> = {
-    trophy: <Trophy className="w-6 h-6" />,
-    star: <Star className="w-6 h-6" />,
-    medal: <Medal className="w-6 h-6" />,
-    award: <Award className="w-6 h-6" />,
-    crown: <Crown className="w-6 h-6" />,
-    sparkles: <Sparkles className="w-6 h-6" />,
-  }
+  const colors = getCategoryColors(achievement.category)
 
   if (achievement.unlocked) {
     return (
-      <div className="text-4xl mb-2">
-        {achievement.icon || iconMap.trophy}
+      <div
+        className="w-12 h-12 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: colors.iconBg }}
+      >
+        <span className="text-2xl">{achievement.icon || '🏆'}</span>
       </div>
     )
   }
 
-  return <Lock className="w-6 h-6 text-gray-400 mb-2" />
+  return (
+    <div
+      className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100"
+    >
+      <svg
+        className="w-5 h-5 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+        />
+      </svg>
+    </div>
+  )
 }
 
 /**
- * Achievement Badge Card
+ * Achievement Badge Card (InBody Style)
  */
 function AchievementBadge({ achievement }: { achievement: Achievement }) {
-  const categoryColors: Record<
-    string,
-    { bg: string; border: string; iconBg: string }
-  > = {
-    streak: { bg: 'bg-orange-50', border: 'border-orange-200', iconBg: 'bg-orange-100' },
-    weight: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
-      iconBg: 'bg-blue-100',
-    },
-    muscle: {
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-      iconBg: 'bg-green-100',
-    },
-    fat: { bg: 'bg-red-50', border: 'border-red-200', iconBg: 'bg-red-100' },
-    score: {
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
-      iconBg: 'bg-yellow-100',
-    },
-    special: {
-      bg: 'bg-purple-50',
-      border: 'border-purple-200',
-      iconBg: 'bg-purple-100',
-    },
-  }
-
-  const colors = categoryColors[achievement.category] || categoryColors.special
+  const colors = getCategoryColors(achievement.category)
 
   return (
     <div
-      className={`relative rounded-xl p-4 border-2 transition-all ${
+      className={`relative rounded-lg p-4 border-2 transition-all ${
         achievement.unlocked
-          ? `${colors.bg} ${colors.border} shadow-sm hover:shadow-md`
+          ? `shadow-sm hover:shadow-md`
           : 'bg-gray-50 border-gray-200 opacity-60'
       }`}
+      style={{
+        backgroundColor: achievement.unlocked ? colors.bg : undefined,
+        borderColor: achievement.unlocked ? colors.border : undefined,
+      }}
     >
       {/* Lock overlay for locked achievements */}
       {!achievement.unlocked && (
-        <div className="absolute inset-0 bg-gray-50/80 rounded-xl flex items-center justify-center z-10">
-          <Lock className="w-8 h-8 text-gray-400" />
+        <div className="absolute inset-0 bg-gray-50/90 rounded-lg flex items-center justify-center z-10">
+          <svg
+            className="w-6 h-6 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
         </div>
       )}
 
       {/* Category Badge */}
       <div className="absolute top-2 right-2">
         <Badge
-          className={`${colors.iconBg} border-0 text-xs capitalize`}
+          className="border-0 text-xs capitalize"
+          style={{
+            backgroundColor: colors.iconBg,
+            color: colors.text,
+          }}
         >
           {achievement.category}
         </Badge>
@@ -110,20 +138,12 @@ function AchievementBadge({ achievement }: { achievement: Achievement }) {
 
       {/* Icon */}
       <div className="flex justify-center mb-3">
-        <div
-          className={`w-16 h-16 rounded-full flex items-center justify-center ${
-            achievement.unlocked ? colors.iconBg : 'bg-gray-200'
-          }`}
-        >
-          <AchievementIcon achievement={achievement} />
-        </div>
+        <AchievementIcon achievement={achievement} />
       </div>
 
       {/* Content */}
       <div className="text-center">
-        <h4 className="text-sm font-bold text-gray-900 mb-1">
-          {achievement.name}
-        </h4>
+        <h4 className="text-sm font-bold text-gray-900 mb-1">{achievement.name}</h4>
         <p className="text-xs text-gray-600 mb-2">{achievement.description}</p>
 
         {/* Progress Bar for in-progress achievements */}
@@ -131,13 +151,14 @@ function AchievementBadge({ achievement }: { achievement: Achievement }) {
           <div className="mt-2">
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-500 rounded-full transition-all duration-300"
-                style={{ width: `${achievement.progress}%` }}
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: colors.border,
+                  width: `${achievement.progress}%`,
+                }}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              {achievement.progress.toFixed(0)}%
-            </p>
+            <p className="text-xs text-gray-500 mt-1">{achievement.progress.toFixed(0)}%</p>
           </div>
         )}
 
@@ -153,7 +174,7 @@ function AchievementBadge({ achievement }: { achievement: Achievement }) {
 }
 
 /**
- * Achievement Badges Component
+ * Achievement Badges Component (SPEC-FE-006 Redesign)
  */
 export function AchievementBadges({
   achievements,
@@ -163,10 +184,7 @@ export function AchievementBadges({
   const unlocked = achievements.filter((a) => a.unlocked)
   const locked = achievements.filter((a) => !a.unlocked)
   const displayAchievements = [
-    ...unlocked.sort(
-      (a, b) =>
-        (a.unlockedAt?.getTime() || 0) - (b.unlockedAt?.getTime() || 0)
-    ),
+    ...unlocked.sort((a, b) => (a.unlockedAt?.getTime() || 0) - (b.unlockedAt?.getTime() || 0)),
     ...locked,
   ].slice(0, maxDisplay)
 
@@ -174,44 +192,53 @@ export function AchievementBadges({
   const completionRate = (totalUnlocked / achievements.length) * 100
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-xl p-6">
+    <div className="w-full bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold text-gray-900 font-['Inter','Noto_Sans_KR',sans-serif]">
-            업적 배지
-          </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <h3 className="text-lg font-bold text-gray-900">업적 배지</h3>
+          <p className="text-sm text-gray-500 mt-0.5">
             {totalUnlocked} / {achievements.length} 개 달성
           </p>
         </div>
 
         {/* Completion Rate Badge */}
         <Badge
-          className={`${
-            completionRate >= 75
-              ? 'bg-purple-50 text-purple-700'
-              : completionRate >= 50
-                ? 'bg-blue-50 text-blue-700'
-                : 'bg-gray-50 text-gray-700'
-          } border-0`}
+          className="border-0 px-3 py-1.5"
+          style={{
+            backgroundColor:
+              completionRate >= 75
+                ? '#DCFCE7'
+                : completionRate >= 50
+                  ? '#DBEAFE'
+                  : '#F3F4F6',
+            color:
+              completionRate >= 75
+                ? '#166534'
+                : completionRate >= 50
+                  ? '#1E40AF'
+                  : '#374151',
+          }}
         >
           {completionRate.toFixed(0)}% 완료
         </Badge>
       </div>
 
       {/* Completion Progress */}
-      <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+      <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: '#F3E8FF' }}>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">전체 완료율</span>
-          <span className="text-lg font-bold text-purple-600">
+          <span className="text-lg font-bold font-mono" style={{ color: '#9333EA' }}>
             {completionRate.toFixed(1)}%
           </span>
         </div>
         <div className="w-full h-2 bg-white rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
-            style={{ width: `${completionRate}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              backgroundColor: '#9333EA',
+              width: `${completionRate}%`,
+            }}
           />
         </div>
       </div>
@@ -246,6 +273,7 @@ export function generateDefaultAchievements(): Achievement[] {
       description: 'InBody 측정을 시작하세요',
       category: 'special',
       unlocked: false,
+      icon: '🎉',
     },
     {
       id: 'streak-7',
@@ -254,6 +282,7 @@ export function generateDefaultAchievements(): Achievement[] {
       category: 'streak',
       unlocked: false,
       progress: 0,
+      icon: '🔥',
     },
     {
       id: 'streak-30',
@@ -262,6 +291,7 @@ export function generateDefaultAchievements(): Achievement[] {
       category: 'streak',
       unlocked: false,
       progress: 0,
+      icon: '💎',
     },
     {
       id: 'weight-goal',
@@ -270,6 +300,7 @@ export function generateDefaultAchievements(): Achievement[] {
       category: 'weight',
       unlocked: false,
       progress: 0,
+      icon: '⚖️',
     },
     {
       id: 'muscle-gain',
@@ -278,6 +309,7 @@ export function generateDefaultAchievements(): Achievement[] {
       category: 'muscle',
       unlocked: false,
       progress: 0,
+      icon: '💪',
     },
     {
       id: 'fat-loss',
@@ -286,6 +318,7 @@ export function generateDefaultAchievements(): Achievement[] {
       category: 'fat',
       unlocked: false,
       progress: 0,
+      icon: '🔥',
     },
     {
       id: 'score-80',
@@ -294,6 +327,7 @@ export function generateDefaultAchievements(): Achievement[] {
       category: 'score',
       unlocked: false,
       progress: 0,
+      icon: '🎯',
     },
     {
       id: 'score-90',
@@ -302,6 +336,7 @@ export function generateDefaultAchievements(): Achievement[] {
       category: 'score',
       unlocked: false,
       progress: 0,
+      icon: '🏆',
     },
   ]
 }

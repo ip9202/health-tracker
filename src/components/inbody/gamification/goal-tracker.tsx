@@ -1,15 +1,19 @@
 /**
- * TAG-FE-001-GAM-003: Goal Tracker Component
- * SPEC: SPEC-FE-004
- * DESCRIPTION: InBody 목표 설정 및 추적 UI 컴포넌트
+ * TAG-FE-013-GAM-003: Goal Tracker Component
+ * SPEC: SPEC-FE-006 (Complete Redesign)
+ * DESCRIPTION: InBody 목표 설정 및 추적 UI - InBody 색상 시스템 적용
+ *
+ * Design System (SPEC-FE-006):
+ * - Completed (100%+): Green (#22C55E)
+ * - On-Track (50-99%): Blue (#0066CC)
+ * - Behind (< 50%): Orange (#F97316)
+ * - Overdue: Red (#EF4444)
  */
 
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -18,7 +22,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Plus, Target, TrendingUp, TrendingDown, Calendar } from 'lucide-react'
 
 export type GoalType = 'weight' | 'muscle' | 'fat' | 'score' | 'streak' | 'custom'
 
@@ -40,7 +43,7 @@ export interface GoalTrackerProps {
 }
 
 /**
- * Calculate goal progress and status
+ * 목표 상태 계산 (InBody Design System)
  */
 function calculateGoalStatus(goal: Goal) {
   const progress = (goal.currentValue / goal.targetValue) * 100
@@ -50,135 +53,126 @@ function calculateGoalStatus(goal: Goal) {
 
   let status: 'completed' | 'on-track' | 'behind' | 'overdue'
   let color: string
+  let bgColor: string
 
   if (isCompleted) {
     status = 'completed'
-    color = 'text-green-600'
+    color = '#22C55E' // InBody Green
+    bgColor = 'bg-green-50'
   } else if (goal.deadline && new Date() > goal.deadline) {
     status = 'overdue'
-    color = 'text-red-600'
+    color = '#EF4444' // Red
+    bgColor = 'bg-red-50'
   } else if (progress >= 50) {
     status = 'on-track'
-    color = 'text-blue-600'
+    color = '#0066CC' // InBody Blue
+    bgColor = 'bg-blue-50'
   } else {
     status = 'behind'
-    color = 'text-yellow-600'
+    color = '#F97316' // InBody Orange
+    bgColor = 'bg-orange-50'
   }
 
-  return { progress, status, color, isCompleted }
+  return { progress, status, color, bgColor, isCompleted }
 }
 
 /**
- * Goal Type Icon
+ * Goal Type Icon and Label
  */
-function GoalTypeIcon({ type }: { type: GoalType }) {
-  const iconMap: Record<GoalType, React.ReactNode> = {
-    weight: <TrendingDown className="w-5 h-5" />,
-    muscle: <TrendingUp className="w-5 h-5" />,
-    fat: <TrendingDown className="w-5 h-5" />,
-    score: <Target className="w-5 h-5" />,
-    streak: <Calendar className="w-5 h-5" />,
-    custom: <Target className="w-5 h-5" />,
+function getGoalTypeInfo(type: GoalType) {
+  const info = {
+    weight: { icon: '⚖️', label: '체중', color: '#0066CC' },
+    muscle: { icon: '💪', label: '근육', color: '#22C55E' },
+    fat: { icon: '🔥', label: '체지방', color: '#F97316' },
+    score: { icon: '🎯', label: '점수', color: '#F59E0B' },
+    streak: { icon: '🔥', label: '스트릭', color: '#EF4444' },
+    custom: { icon: '✏️', label: '직접', color: '#9333EA' },
   }
-
-  return iconMap[type]
+  return info[type]
 }
 
 /**
- * Goal Card Component
+ * Goal Card Component (InBody Style)
  */
 function GoalCard({ goal }: { goal: Goal }) {
   const statusData = calculateGoalStatus(goal)
+  const typeInfo = getGoalTypeInfo(goal.type)
 
   return (
-    <Card
-      className={`hover:shadow-md transition-shadow ${
-        statusData.isCompleted ? 'border-green-300 bg-green-50/30' : ''
+    <div
+      className={`bg-white border rounded-lg p-4 hover:shadow-sm transition-shadow ${
+        statusData.isCompleted ? 'border-green-300' : 'border-gray-200'
       }`}
     >
-      <CardContent className="p-4">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div
-              className={`p-2 rounded-lg ${
-                statusData.isCompleted
-                  ? 'bg-green-100 text-green-600'
-                  : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              <GoalTypeIcon type={goal.type} />
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900">
-                {goal.name}
-              </h4>
-              <p className="text-xs text-gray-500">
-                {goal.currentValue.toFixed(1)} / {goal.targetValue.toFixed(1)}{' '}
-                {goal.unit}
-              </p>
-            </div>
-          </div>
-
-          <Badge
-            className={`${
-              statusData.status === 'completed'
-                ? 'bg-green-100 text-green-700'
-                : statusData.status === 'overdue'
-                  ? 'bg-red-100 text-red-700'
-                  : statusData.status === 'on-track'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-yellow-100 text-yellow-700'
-            } border-0`}
-          >
-            {statusData.progress.toFixed(0)}%
-          </Badge>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-3">
           <div
-            className={`absolute top-0 bottom-0 left-0 rounded-full transition-all duration-500 ${
-              statusData.isCompleted
-                ? 'bg-green-500'
-                : statusData.status === 'overdue'
-                  ? 'bg-red-500'
-                  : 'bg-blue-500'
-            }`}
-            style={{ width: `${Math.min(statusData.progress, 100)}%` }}
-          />
+            className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+            style={{ backgroundColor: statusData.bgColor }}
+          >
+            {typeInfo.icon}
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">{goal.name}</h4>
+            <p className="text-xs text-gray-500">
+              {goal.currentValue.toFixed(1)} / {goal.targetValue.toFixed(1)} {goal.unit}
+            </p>
+          </div>
         </div>
 
-        {/* Deadline */}
-        {goal.deadline && (
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>마감일</span>
-            <span
-              className={
-                statusData.status === 'overdue' ? 'text-red-600 font-semibold' : ''
-              }
-            >
-              {new Date(goal.deadline).toLocaleDateString('ko-KR')}
-            </span>
-          </div>
-        )}
+        <Badge
+          className="border-0 px-2.5 py-1"
+          style={{
+            backgroundColor: statusData.bgColor,
+            color: statusData.color,
+          }}
+        >
+          {statusData.progress.toFixed(0)}%
+        </Badge>
+      </div>
 
-        {/* Completed Badge */}
-        {statusData.isCompleted && (
-          <div className="mt-2 p-2 bg-green-100 rounded-md flex items-center gap-2">
-            <Target className="w-4 h-4 text-green-600" />
-            <span className="text-xs font-semibold text-green-700">
-              목표 달성!
-            </span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      {/* Progress Bar */}
+      <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+        <div
+          className="absolute top-0 bottom-0 left-0 rounded-full transition-all duration-500"
+          style={{
+            backgroundColor: statusData.color,
+            width: `${Math.min(statusData.progress, 100)}%`,
+          }}
+        />
+      </div>
+
+      {/* Deadline */}
+      {goal.deadline && (
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <span>마감일</span>
+          <span
+            className={statusData.status === 'overdue' ? 'text-red-600 font-semibold' : ''}
+          >
+            {new Date(goal.deadline).toLocaleDateString('ko-KR')}
+          </span>
+        </div>
+      )}
+
+      {/* Completed Badge */}
+      {statusData.isCompleted && (
+        <div
+          className="mt-2 p-2.5 rounded-md border-l-4 flex items-center gap-2"
+          style={{ backgroundColor: statusData.bgColor, borderLeftColor: statusData.color }}
+        >
+          <span className="text-lg">🎉</span>
+          <span className="text-xs font-semibold" style={{ color: statusData.color }}>
+            목표 달성!
+          </span>
+        </div>
+      )}
+    </div>
   )
 }
 
 /**
- * Add Goal Dialog Content
+ * Add Goal Dialog Content (InBody Style)
  */
 function AddGoalDialogContent({
   onAdd,
@@ -206,6 +200,15 @@ function AddGoalDialogContent({
     onClose()
   }
 
+  const goalTypes: Array<{ type: GoalType; label: string; icon: string }> = [
+    { type: 'weight', label: '체중', icon: '⚖️' },
+    { type: 'muscle', label: '근육', icon: '💪' },
+    { type: 'fat', label: '체지방', icon: '🔥' },
+    { type: 'score', label: '점수', icon: '🎯' },
+    { type: 'streak', label: '스트릭', icon: '🔥' },
+    { type: 'custom', label: '직접', icon: '✏️' },
+  ]
+
   return (
     <div className="space-y-4">
       {/* Goal Type Selection */}
@@ -214,14 +217,7 @@ function AddGoalDialogContent({
           목표 유형
         </label>
         <div className="grid grid-cols-3 gap-2">
-          {[
-            { type: 'weight' as GoalType, label: '체중', icon: '⚖️' },
-            { type: 'muscle' as GoalType, label: '근육', icon: '💪' },
-            { type: 'fat' as GoalType, label: '체지방', icon: '🔥' },
-            { type: 'score' as GoalType, label: '점수', icon: '🎯' },
-            { type: 'streak' as GoalType, label: '스트릭', icon: '🔥' },
-            { type: 'custom' as GoalType, label: '직접', icon: '✏️' },
-          ].map((option) => (
+          {goalTypes.map((option) => (
             <button
               key={option.type}
               onClick={() => setType(option.type)}
@@ -279,37 +275,36 @@ function AddGoalDialogContent({
       </div>
 
       {/* Submit Button */}
-      <Button onClick={handleSubmit} className="w-full">
+      <button
+        onClick={handleSubmit}
+        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+      >
         목표 추가
-      </Button>
+      </button>
     </div>
   )
 }
 
 /**
- * Goal Tracker Component
+ * Goal Tracker Component (SPEC-FE-006 Redesign)
  */
 export function GoalTracker({ goals, onGoalAdd }: GoalTrackerProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-  // Calculate overall stats
-  const completedGoals = goals.filter((g) => calculateGoalStatus(g).isCompleted)
-    .length
+  // 전체 통계 계산
+  const completedGoals = goals.filter((g) => calculateGoalStatus(g).isCompleted).length
   const overallProgress =
     goals.length > 0
-      ? goals.reduce((acc, g) => acc + calculateGoalStatus(g).progress, 0) /
-        goals.length
+      ? goals.reduce((acc, g) => acc + calculateGoalStatus(g).progress, 0) / goals.length
       : 0
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-xl p-6">
+    <div className="w-full bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold text-gray-900 font-['Inter','Noto_Sans_KR',sans-serif]">
-            목표 관리
-          </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <h3 className="text-lg font-bold text-gray-900">목표 관리</h3>
+          <p className="text-sm text-gray-500 mt-0.5">
             {completedGoals} / {goals.length} 목표 달성
           </p>
         </div>
@@ -317,10 +312,12 @@ export function GoalTracker({ goals, onGoalAdd }: GoalTrackerProps) {
         {/* Add Goal Button */}
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-2">
-              <Plus className="w-4 h-4" />
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
               목표 추가
-            </Button>
+            </button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -342,17 +339,20 @@ export function GoalTracker({ goals, onGoalAdd }: GoalTrackerProps) {
 
       {/* Overall Progress */}
       {goals.length > 0 && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg">
+        <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: '#DBEAFE' }}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700">전체 진행률</span>
-            <span className="text-lg font-bold text-blue-600">
+            <span className="text-lg font-bold font-mono" style={{ color: '#0066CC' }}>
               {overallProgress.toFixed(1)}%
             </span>
           </div>
           <div className="w-full h-2 bg-white rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-500"
-              style={{ width: `${overallProgress}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                backgroundColor: '#0066CC',
+                width: `${overallProgress}%`,
+              }}
             />
           </div>
         </div>
@@ -361,19 +361,19 @@ export function GoalTracker({ goals, onGoalAdd }: GoalTrackerProps) {
       {/* Goals Grid */}
       {goals.length === 0 ? (
         <div className="text-center py-12">
-          <Target className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <div className="text-4xl mb-3">🎯</div>
           <p className="text-gray-500 mb-4">설정된 목표가 없습니다</p>
-          <Button onClick={() => setIsAddDialogOpen(true)} variant="outline">
+          <button
+            onClick={() => setIsAddDialogOpen(true)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             첫 목표 설정하기
-          </Button>
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {goals.map((goal) => (
-            <GoalCard
-              key={goal.id}
-              goal={goal}
-            />
+            <GoalCard key={goal.id} goal={goal} />
           ))}
         </div>
       )}

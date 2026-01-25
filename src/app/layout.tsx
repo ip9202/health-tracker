@@ -1,12 +1,32 @@
 /**
  * 루트 레이아웃 컴포넌트
  * 애플리케이션의 최상위 레이아웃을 정의하고 QueryClient, Session을 제공
- * SPEC: SPEC-AUTH-001
+ * SPEC: SPEC-AUTH-001, SPEC-FE-006 (InBody Design System)
  */
 import type { Metadata } from 'next'
+import { Inter, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 import { QueryClientProvider } from '@/components/providers/query-provider'
 import { SessionProvider } from '@/components/providers/session-provider'
+
+/**
+ * InBody Design System 폰트 설정
+ * - Inter: 한국어 최적화 폰트 (제목, 본문)
+ * - Roboto Mono: 데이터 강조 폰트 (숫자)
+ */
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-roboto-mono',
+  display: 'swap',
+})
 
 /**
  * 페이지 메타데이터
@@ -26,8 +46,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko">
-      <body className="antialiased">
+    <html lang="ko" className={`${inter.variable} ${robotoMono.variable}`}>
+      <body className="font-sans antialiased">
         <SessionProvider>
           <QueryClientProvider>
             {children}

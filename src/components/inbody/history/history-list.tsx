@@ -32,11 +32,13 @@ export function HistoryList() {
       try {
         setIsLoading(true)
         const response = await fetchInBodyHistory({ page, pageSize })
-        setRecords(response.records as unknown as HistoryRecord[])
-        setTotal(response.total)
+        // 응답 구조 안전하게 확인
+        setRecords((response?.records ?? []) as unknown as HistoryRecord[])
+        setTotal(response?.total ?? 0)
       } catch (error) {
         console.error('Failed to load history:', error)
         setRecords([])
+        setTotal(0)
       } finally {
         setIsLoading(false)
       }
@@ -51,8 +53,9 @@ export function HistoryList() {
     try {
       await deleteInBodyRecord(id)
       const response = await fetchInBodyHistory({ page, pageSize })
-      setRecords(response.records as unknown as HistoryRecord[])
-      setTotal(response.total)
+      // 응답 구조 안전하게 확인
+      setRecords((response?.records ?? []) as unknown as HistoryRecord[])
+      setTotal(response?.total ?? 0)
     } catch (error) {
       console.error('Failed to delete record:', error)
       alert('기록 삭제에 실패했습니다.')

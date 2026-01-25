@@ -1,0 +1,119 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img [ref=e7]
+          - heading "Health Tracker" [level=1] [ref=e9]
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e11] [cursor=pointer]:
+            - /url: "#"
+          - link "Reports" [ref=e12] [cursor=pointer]:
+            - /url: "#"
+          - link "Community" [ref=e13] [cursor=pointer]:
+            - /url: "#"
+          - link "Settings" [ref=e14] [cursor=pointer]:
+            - /url: "#"
+        - button "로그인" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - heading "InBody Dashboard" [level=1] [ref=e24]
+          - paragraph [ref=e26]: Manage and visualize your body composition data.
+        - generic [ref=e27]:
+          - generic [ref=e29]:
+            - generic [ref=e30]:
+              - heading "Image Upload" [level=3] [ref=e31]
+              - paragraph [ref=e32]: Upload your InBody result sheet for AI analysis.
+            - generic [ref=e33]:
+              - heading "OCR 엔진 선택" [level=4] [ref=e34]
+              - generic [ref=e35]:
+                - generic [ref=e36] [cursor=pointer]:
+                  - radio "Google Vision API (서버) - 높은 정확도 ⭐⭐⭐" [checked] [ref=e37]
+                  - generic [ref=e38]: Google Vision API (서버) - 높은 정확도 ⭐⭐⭐
+                - generic [ref=e39] [cursor=pointer]:
+                  - radio "Tesseract.js (클라이언트) - 빠른 처리 ⚡" [ref=e40]
+                  - generic [ref=e41]: Tesseract.js (클라이언트) - 빠른 처리 ⚡
+              - paragraph [ref=e42]: 💡 Google Vision API를 권장합니다. InBody 결과지 텍스트 추출 정확도가 훨씬 높습니다.
+            - generic [ref=e43] [cursor=pointer]:
+              - img [ref=e45]
+              - generic [ref=e48]:
+                - generic [ref=e49]: Click to upload
+                - generic [ref=e50]: or drag and drop
+              - paragraph [ref=e51]: JPG or PNG (max. 10MB)
+          - generic [ref=e53]:
+            - img [ref=e55]
+            - generic [ref=e57]:
+              - heading "InBody 데이터 없음" [level=3] [ref=e58]
+              - paragraph [ref=e59]: InBody 결과지를 업로드하여 건강 데이터를 확인하세요.
+          - generic [ref=e61]:
+            - generic [ref=e62]:
+              - generic [ref=e63]:
+                - heading "Body Composition Trend" [level=3] [ref=e64]
+                - paragraph [ref=e65]: 0 records
+              - combobox [ref=e66] [cursor=pointer]:
+                - option "6 Months" [selected]
+                - option "1 Year"
+                - option "All Time"
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - generic [ref=e69]:
+                  - paragraph [ref=e70]: Weight
+                  - generic [ref=e71]:
+                    - paragraph [ref=e72]: "--"
+                    - paragraph [ref=e73]: kg
+                - generic [ref=e74]:
+                  - paragraph [ref=e75]: Muscle Mass
+                  - generic [ref=e76]:
+                    - paragraph [ref=e77]: "--"
+                    - paragraph [ref=e78]: kg
+                - generic [ref=e79]:
+                  - paragraph [ref=e80]: Body Fat %
+                  - generic [ref=e81]:
+                    - paragraph [ref=e82]: "--"
+                    - paragraph [ref=e83]: "%"
+              - generic [ref=e85]: No data available. Upload an InBody result to see trends.
+          - generic [ref=e87]:
+            - generic [ref=e88]:
+              - generic [ref=e89]:
+                - heading "Measurement History" [level=3] [ref=e90]
+                - paragraph [ref=e91]: Total 0 records found
+              - button "Download CSV" [disabled] [ref=e92]:
+                - generic [ref=e93]: Download CSV
+            - table [ref=e97]:
+              - rowgroup [ref=e98]:
+                - row "Date Weight Muscle Mass Body Fat % BMI Actions" [ref=e99]:
+                  - columnheader "Date" [ref=e100]:
+                    - paragraph [ref=e101]: Date
+                  - columnheader "Weight" [ref=e102]:
+                    - paragraph [ref=e103]: Weight
+                  - columnheader "Muscle Mass" [ref=e104]:
+                    - paragraph [ref=e105]: Muscle Mass
+                  - columnheader "Body Fat %" [ref=e106]:
+                    - paragraph [ref=e107]: Body Fat %
+                  - columnheader "BMI" [ref=e108]:
+                    - paragraph [ref=e109]: BMI
+                  - columnheader "Actions" [ref=e110]:
+                    - paragraph [ref=e111]: Actions
+              - rowgroup [ref=e112]:
+                - row "No records found. Upload an InBody result to get started." [ref=e113]:
+                  - cell "No records found. Upload an InBody result to get started." [ref=e114]
+  - generic [ref=e119] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e120]:
+      - img [ref=e121]
+    - generic [ref=e124]:
+      - button "Open issues overlay" [ref=e125]:
+        - generic [ref=e126]:
+          - generic [ref=e127]: "1"
+          - generic [ref=e128]: "2"
+        - generic [ref=e129]:
+          - text: Issue
+          - generic [ref=e130]: s
+      - button "Collapse issues badge" [ref=e131]:
+        - img [ref=e132]
+  - alert [ref=e134]
+```

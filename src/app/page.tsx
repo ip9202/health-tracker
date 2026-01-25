@@ -5,12 +5,12 @@
  */
 
 import { DashboardLayout } from '@/components/inbody/dashboard-layout'
-import { InBodyDashboard } from '@/components/inbody/inbody-dashboard'
+import { EnhancedInBodyDashboard } from '@/components/inbody/visualizations/enhanced-dashboard'
 
 export default function HomePage() {
   return (
     <DashboardLayout>
-      <InBodyDashboard />
+      <EnhancedInBodyDashboard />
     </DashboardLayout>
   )
 }

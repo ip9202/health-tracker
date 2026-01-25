@@ -24,6 +24,13 @@
       "env": {
         "GOOGLE_CLOUD_PROJECT": "iron-stitch-project"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
     }
   },
   "staggeredStartup": {

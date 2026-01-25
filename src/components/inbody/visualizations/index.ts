@@ -11,3 +11,9 @@ export type { ECWTBWRatioProps } from './ecw-tbw-ratio'
 
 export { TrendSparkline, SparklineGrid } from './trend-sparkline'
 export type { TrendSparklineProps, SparklineGridProps, TrendDataPoint } from './trend-sparkline'
+
+export { ComparisonChart, QuickComparison } from './comparison-chart'
+export type { ComparisonChartProps, ComparisonMetric, QuickComparisonProps } from './comparison-chart'
+
+export { SegmentalAnalysis } from './segmental-analysis'
+export type { SegmentalAnalysisProps, SegmentalData } from './segmental-analysis'
