@@ -18,7 +18,6 @@ import type { InBodyRecord } from '@/lib/types/inbody';
 import {
   createChartMetrics,
   formatMetricValue,
-  formatRangeText,
   getStatusDescription,
   calculateZoneSegments,
   calculateZonePercentage,
@@ -49,9 +48,8 @@ function MetricBarItem({ metric }: { metric: ChartMetric }) {
   const statusLabel = getStatusLabel(metric.status);
 
   // InBody 스타일: 표준 범위 계산을 위한 백분율
-  const standardRange = metric.range.high - metric.range.low;
-  const rangeStartPercent = ((metric.range.low - (metric.range.low - standardRange * 0.5)) / (standardRange * 2)) * 100;
-  const rangeEndPercent = 100 - rangeStartPercent;
+  const _standardRange = metric.range.high - metric.range.low;
+  const _rangeStartPercent = ((metric.range.low - (metric.range.low - _standardRange * 0.5)) / (_standardRange * 2)) * 100;
 
   return (
     <div className="mb-6 last:mb-0">

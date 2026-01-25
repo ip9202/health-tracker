@@ -239,8 +239,7 @@ export async function detectRotation(canvas: HTMLCanvasElement): Promise<number>
 
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
-      const idx = (y * width + x) * 4;
-      const gray = data[idx];
+      const _idx = (y * width + x) * 4;
 
       // Sobel 엣지 검출
       const gx =

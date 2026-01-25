@@ -205,7 +205,7 @@ export default function OCRTestPage() {
   };
 
   // 사용자 입력에서 패턴 찾기
-  const findPatternFromInput = (field: string, userInput: string, ocrText: string): PatternMatch | null => {
+  const findPatternFromInput = (field: string, userInput: string, _ocrText: string): PatternMatch | null => {
     if (!ocrResult) return null;
 
     const text = ocrResult.text;

@@ -89,7 +89,7 @@ export function RiskFactorList({ riskFactors, isLoading = false }: RiskFactorLis
     return labels[level] || level;
   };
 
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = (_category: string) => {
     return <AlertTriangle className="h-4 w-4" />;
   };
 

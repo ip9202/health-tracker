@@ -485,7 +485,7 @@ export function parseInBodyData(ocrText: string): ParseResult {
   // ========== 4. 체중 조절 추출 ==========
   // 체중 조절: "체중조절: 유지" 또는 "체중 조절 +0.7kg" 또는 "체중 조절 유지"
   // 숫자 형식 (콜론 유무 모두 지원)
-  let weightControlMatch = text.match(/체중\s*조절\s*:?\s*([+\-]?\d+\.?\d*)\s*kg?/);
+  const weightControlMatch = text.match(/체중\s*조절\s*:?\s*([+\-]?\d+\.?\d*)\s*kg?/);
   if (weightControlMatch) {
     data.weightControl = weightControlMatch[1];
   } else {

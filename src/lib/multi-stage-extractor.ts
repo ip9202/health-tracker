@@ -259,7 +259,7 @@ function createSuccessResult(
  */
 export async function extractBodyScore(
   ocrText: string | undefined | null,
-  config: MultiStageConfig = DEFAULT_CONFIG
+  _config: MultiStageConfig = DEFAULT_CONFIG
 ): Promise<ExtractionResult> {
   const startTime = Date.now();
   const attempts: ExtractionAttempt[] = [];

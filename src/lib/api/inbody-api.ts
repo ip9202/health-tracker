@@ -4,7 +4,7 @@
  * DESCRIPTION: InBody 데이터 관리 API 호출 함수
  */
 
-import type { UploadResponse, HistoryResponse, DateRangeFilter } from '@/lib/types/inbody'
+import type { UploadResponse, HistoryResponse } from '@/lib/types/inbody'
 
 /**
  * 클라이언트 OCR 결과와 함께 InBody 데이터 업로드

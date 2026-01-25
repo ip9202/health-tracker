@@ -4,7 +4,7 @@
  * DESCRIPTION: 차트 탭 전환, 로딩 상태, 빈 상태를 관리하는 컨테이너
  */
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'

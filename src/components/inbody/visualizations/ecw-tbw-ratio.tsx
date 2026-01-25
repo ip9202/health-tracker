@@ -92,15 +92,11 @@ function GaugeChart({
   value,
   min = 0.340,
   max = 0.440,
-  normalMin = 0.380,
-  normalMax = 0.390,
   color,
 }: {
   value: number
   min?: number
   max?: number
-  normalMin: number
-  normalMax: number
   color: string
 }) {
   const range = max - min

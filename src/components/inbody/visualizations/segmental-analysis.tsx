@@ -12,7 +12,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Badge } from '@/components/ui/badge'
 
 export interface SegmentalData {
   // 5개 부위 근육량 (kg)
@@ -84,7 +83,7 @@ function BodyDiagram({
     onSegmentHover?.(segment)
   }
 
-  const segments = [
+  const _segments = [
     { key: 'leftArm' as const, value: data.leftArm },
     { key: 'rightArm' as const, value: data.rightArm },
     { key: 'trunk' as const, value: data.trunk },

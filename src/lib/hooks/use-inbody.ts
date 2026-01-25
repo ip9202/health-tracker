@@ -6,7 +6,7 @@
 
 import { useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult } from '@tanstack/react-query'
 import { uploadInBodyImage, fetchInBodyHistory, deleteInBodyRecord } from '@/lib/api/inbody-api'
-import type { InBodyRecord, UploadResponse, HistoryResponse } from '@/lib/types/inbody'
+import type { UploadResponse, HistoryResponse } from '@/lib/types/inbody'
 
 /**
  * InBody 측정 기록 조회 Query Hook

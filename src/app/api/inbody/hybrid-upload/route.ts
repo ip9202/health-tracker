@@ -59,19 +59,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(errorResponse, { status: 400 });
     }
 
-    console.log('[Hybrid Upload] 이미지 수신, 사용자:', userId);
+    console.warn('[Hybrid Upload] 이미지 수신, 사용자:', userId);
 
     // 3. 하이브리드 추출 실행 (OCR → AI 정제 → Vision fallback)
-    console.log('[Hybrid Upload] 하이브리드 추출 시작...');
+    console.warn('[Hybrid Upload] 하이브리드 추출 시작...');
     const startTime = Date.now();
 
     const extractedData = await extractInBodyHybrid(imageBase64);
 
     const processingTime = Date.now() - startTime;
-    console.log('[Hybrid Upload] 추출 완료, 소요 시간:', processingTime, 'ms');
+    console.warn('[Hybrid Upload] 추출 완료, 소요 시간:', processingTime, 'ms');
 
     // 4. 데이터베이스 저장
-    console.log('[Hybrid Upload] 데이터베이스 저장 시작...');
+    console.warn('[Hybrid Upload] 데이터베이스 저장 시작...');
     const record = await prisma.inBodyRecord.create({
       data: {
         userId,
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('[Hybrid Upload] 저장 완료, 레코드 ID:', record.id);
+    console.warn('[Hybrid Upload] 저장 완료, 레코드 ID:', record.id);
 
     // 5. 성공 응답
     const successResponse: HybridUploadResponse = {

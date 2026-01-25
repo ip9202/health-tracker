@@ -233,7 +233,7 @@ export function calculateZoneSegments(metric: ChartMetric): ZoneSegment[] {
 
   // 전체 표시 범위 계산 (최소값 ~ 최대값)
   // low와 high 사이를 중심으로 여유를 두어 전체 범위 설정
-  const midPoint = (range.low + range.high) / 2;
+  const _midPoint = (range.low + range.high) / 2;
   const spread = range.high - range.low;
 
   // 전체 범위: low보다 약간 낮은 값부터 high보다 약간 높은 값까지
@@ -277,7 +277,7 @@ export function calculateZonePercentage(metric: ChartMetric): number {
   const { range, value } = metric;
 
   // 전체 표시 범위 계산
-  const midPoint = (range.low + range.high) / 2;
+  const _midPoint = (range.low + range.high) / 2;
   const spread = range.high - range.low;
   const minDisplay = Math.max(0, range.low - spread * 0.5);
   const maxDisplay = range.high + spread * 0.5;

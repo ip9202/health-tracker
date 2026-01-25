@@ -21,7 +21,7 @@ export function Dropzone({ onFileSelect }: DropzoneProps) {
   const [error, setError] = React.useState<string | null>(null)
 
   const onDrop = useCallback(
-    (acceptedFiles: File[], rejectedFiles: any[]) => {
+    (acceptedFiles: File[], _rejectedFiles: any[]) => {
       setError(null)
 
       // 파일 크기 검증

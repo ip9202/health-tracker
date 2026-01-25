@@ -10,7 +10,6 @@ import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
-import { ko } from 'date-fns/locale'
 
 interface HistoryFiltersProps {
   onFilterChange: (filters: { from?: string; to?: string }) => void

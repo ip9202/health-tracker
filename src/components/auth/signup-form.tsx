@@ -98,7 +98,7 @@ export default function SignUpForm() {
 
       // Success - redirect to signin or dashboard
       router.push('/auth/signin?message=회원가입이 완료되었습니다. 로그인해주세요.')
-    } catch (error) {
+    } catch {
       setErrors({ form: '서버 오류가 발생했습니다. 다시 시도해주세요.' })
     } finally {
       setIsLoading(false)

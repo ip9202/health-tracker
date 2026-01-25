@@ -58,14 +58,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(errorResponse, { status: 400 });
     }
 
-    console.log('[Vision Upload] 이미지 수신, 사용자:', userId);
+    console.warn('[Vision Upload] 이미지 수신, 사용자:', userId);
 
     // 3. Vision API로 데이터 추출
-    console.log('[Vision Upload] Vision API 호출 시작...');
+    console.warn('[Vision Upload] Vision API 호출 시작...');
     const extractedData = await extractInBodyFromImage(imageBase64);
 
     // 4. 데이터베이스 저장
-    console.log('[Vision Upload] 데이터베이스 저장 시작...');
+    console.warn('[Vision Upload] 데이터베이스 저장 시작...');
     const record = await prisma.inBodyRecord.create({
       data: {
         userId,
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('[Vision Upload] 저장 완료, 레코드 ID:', record.id);
+    console.warn('[Vision Upload] 저장 완료, 레코드 ID:', record.id);
 
     // 5. 성공 응답
     const successResponse: VisionUploadResponse = {

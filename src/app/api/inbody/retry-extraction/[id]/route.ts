@@ -95,7 +95,7 @@ export async function POST(
     let body: RetryRequestBody;
     try {
       body = await parseRequestBody(request);
-    } catch (parseError) {
+    } catch {
       const errorResponse: ApiErrorResponse = {
         error: '잘못된 요청 형식입니다',
         errorCode: 'BAD_REQUEST',

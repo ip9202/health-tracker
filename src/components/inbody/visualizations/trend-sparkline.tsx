@@ -12,7 +12,7 @@
 
 'use client'
 
-import { useMemo } from 'react'
+import 'react'
 import {
   LineChart,
   Line,

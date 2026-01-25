@@ -4,7 +4,6 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/prisma'
 import { verifyPassword } from '@/lib/password'
 import { signInSchema } from './validations'
-import type { User } from '@prisma/client'
 
 /**
  * NextAuth.js 설정

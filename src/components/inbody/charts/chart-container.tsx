@@ -172,8 +172,7 @@ export function ChartContainer() {
                     color: '#101828',
                     fontSize: '14px',
                   }}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value: any, name: any) => {
+                  formatter={(value: unknown, name: unknown) => {
                     const v = typeof value === 'number' ? value.toFixed(1) : '--'
                     if (name === 'Weight (kg)') return [v, 'Weight']
                     if (name === 'Muscle (kg)') return [v, 'Muscle']
