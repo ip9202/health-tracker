@@ -6,12 +6,13 @@
 SPEC_ID: SPEC-OCR-001
 TITLE: InBody Body Score Extraction Accuracy Improvement System
 DOMAIN: OCR
-STATUS: planned
+STATUS: completed
 PRIORITY: High
-ASSIGNED: manager-tdd
+ASSIGNED: manager-ddd
 CREATED: 2026-01-16
+COMPLETED: 2026-01-25
 RELATED: SPEC-DATA-003
-VERSION: 1.0.0
+VERSION: 1.1.0
 ```
 
 ## 환경 (Environment)

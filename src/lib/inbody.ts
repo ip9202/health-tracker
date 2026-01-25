@@ -15,6 +15,7 @@ const PersonalInfoSchema = z.object({
   gender: z.enum(['male', 'female', 'other']).optional(),
   age: z.number().int().min(0).max(150).optional(),
   height: z.number().positive().optional(), // cm
+  measuredAt: z.date().optional(), // 측정일
 });
 
 // 체성분 데이터 스키마

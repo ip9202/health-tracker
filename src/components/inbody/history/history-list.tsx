@@ -6,9 +6,8 @@
  * DESCRIPTION: InBody 측정 기록 리스트 (실제 API 데이터 연동)
  */
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Eye, Trash2, Calendar } from 'lucide-react'
-import { Download } from 'lucide-react'
 import { fetchInBodyHistory, deleteInBodyRecord } from '@/lib/api/inbody-api'
 
 interface HistoryRecord {
@@ -91,7 +90,7 @@ export function HistoryList() {
     <div className='flex flex-col gap-6 flex-1 min-h-0'>
       <div className='flex items-center justify-between'>
         <div className='flex flex-col gap-1'>
-          <h3 className='text-[18px] font-semibold leading-7 tracking-[-0.44px] text-[#101828] font-['Inter',sans-serif]'>
+          <h3 className="text-[18px] font-semibold leading-7 tracking-[-0.44px] text-[#101828] font-['Inter',sans-serif]">
             Measurement History
           </h3>
           <p className='text-[16px] font-normal leading-6 tracking-[-0.31px] text-[#717182]'>

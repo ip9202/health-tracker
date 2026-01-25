@@ -6,8 +6,7 @@
  * DESCRIPTION: InBody 데이터 차트 컨테이너 (실제 API 데이터 연동)
  */
 
-import React, { useEffect, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   LineChart,
   Line,
@@ -117,7 +116,7 @@ export function ChartContainer() {
             <p className='text-[12px] font-medium leading-4 text-[#10b981]'>Muscle Mass</p>
             <div className='flex items-baseline gap-1'>
               <p className='text-[20px] font-bold leading-7 tracking-[-0.45px] text-[#007a55]'>
-                {latestData?.muscleMass ? latestData.muscleMass.toFixed(1) : '--'}
+                {latestData?.skeletalMuscle ? latestData.skeletalMuscle.toFixed(1) : '--'}
               </p>
               <p className='text-[14px] font-normal leading-5 text-[#007a55]'>kg</p>
             </div>
@@ -127,7 +126,7 @@ export function ChartContainer() {
             <p className='text-[12px] font-medium leading-4 text-[#dc2626]'>Body Fat %</p>
             <div className='flex items-baseline gap-1'>
               <p className='text-[20px] font-bold leading-7 tracking-[-0.45px] text-[#b91c1c]'>
-                {latestData?.bodyFat ? latestData.bodyFat.toFixed(1) : '--'}
+                {latestData?.bodyFatPercentage ? latestData.bodyFatPercentage.toFixed(1) : '--'}
               </p>
               <p className='text-[14px] font-normal leading-5 text-[#b91c1c]'>%</p>
             </div>
@@ -173,11 +172,13 @@ export function ChartContainer() {
                     color: '#101828',
                     fontSize: '14px',
                   }}
-                  formatter={(value: number, name: string) => {
-                    if (name === 'Weight (kg)') return [value?.toFixed(1) ?? '--', 'Weight']
-                    if (name === 'Muscle (kg)') return [value?.toFixed(1) ?? '--', 'Muscle']
-                    if (name === 'Body Fat (%)') return [value?.toFixed(1) ?? '--', 'Body Fat %']
-                    return [value, name]
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value: any, name: any) => {
+                    const v = typeof value === 'number' ? value.toFixed(1) : '--'
+                    if (name === 'Weight (kg)') return [v, 'Weight']
+                    if (name === 'Muscle (kg)') return [v, 'Muscle']
+                    if (name === 'Body Fat (%)') return [v, 'Body Fat %']
+                    return [v, name ?? '']
                   }}
                 />
                 <Legend
