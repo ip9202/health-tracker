@@ -4,293 +4,485 @@
 
 ```
 health/
-├── .claude/                    # Claude Code 설정 및 커스터마이징
-│   ├── agents/                 # 서브에이전트 정의
-│   │   └── moai/              # MoAI 전용 에이전트 (20개)
-│   │       ├── manager-*.md   # 매니저 에이전트 (8개)
-│   │       ├── expert-*.md    # 전문가 에이전트 (8개)
-│   │       └── builder-*.md   # 빌더 에이전트 (4개)
-│   ├── commands/               # 슬래시 명령어 정의
-│   │   └── moai/              # MoAI 전용 명령어 (10개)
-│   │       ├── 0-project.md   # 프로젝트 구성 관리
-│   │       ├── 1-plan.md      # 명세서 생성
-│   │       ├── 2-run.md       # TDD 구현
-│   │       ├── 3-sync.md      # 문서 동기화
-│   │       ├── 9-feedback.md  # 피드백 수집
-│   │       ├── alfred.md      # 지능형 라우팅
-│   │       ├── fix.md         # 빠른 수정
-│   │       ├── loop.md        # 반복 작업 자동화
-│   │       └── cancel-loop.md # 루프 중지
-│   ├── hooks/                  # 이벤트 기반 자동화 스크립트
-│   │   └── moai/              # MoAI 전용 훅
-│   │       ├── lib/           # 공유 라이브러리
-│   │       ├── session_start__show_project_info.py
-│   │       ├── session_end__auto_cleanup.py
-│   │       ├── pre_tool__security_guard.py
-│   │       ├── post_tool__linter.py
-│   │       └── post_tool__code_formatter.py
-│   ├── output-styles/          # 출력 스타일 테마
-│   │   └── moai/
-│   │       ├── r2d2.md        # R2-D2 스타일
-│   │       └── yoda.md        # Yoda 스타일
-│   └── skills/                 # 모델 호출 기반 확장 기능
-│       └── moai-*/            # MoAI 전용 스킬 라이브러리
-│           ├── moai-foundation-*/   # 핵심 프레임워크 스킬
-│           ├── moai-lang-*/         # 언어별 스킬
-│           ├── moai-domain-*/       # 도메인별 스킬
-│           ├── moai-library-*/      # 라이브러리 스킬
-│           ├── moai-workflow-*/     # 워크플로우 스킬
-│           └── moai-*/              # 기타 유틸리티 스킬
-├── .moai/                      # MoAI-ADK 프레임워크 설정
-│   ├── config/                 # 설정 파일
-│   │   ├── config.yaml        # 메인 설정 파일
-│   │   └── sections/          # 모듈화된 설정 섹션
-│   │       ├── user.yaml      # 사용자 설정
-│   │       ├── language.yaml  # 언어 설정
-│   │       ├── project.yaml   # 프로젝트 메타데이터
-│   │       ├── git-strategy.yaml # Git 워크플로우
-│   │       ├── quality.yaml   # 품질 설정 (TRUST 5)
-│   │       └── system.yaml    # 시스템 설정
-│   ├── project/                # 프로젝트 문서
-│   │   ├── product.md         # 제품 개요
-│   │   ├── structure.md       # 구조 설명 (본 파일)
-│   │   └── tech.md            # 기술 스택
-│   ├── docs/                   # 생성된 문서 저장소
-│   ├── logs/                   # 런타임 로그 (30일 보관)
-│   ├── temp/                   # 임시 파일 (7일 보관)
-│   ├── cache/                  # 캐시 파일 (30일 보관)
-│   └── specs/                  # 명세서 저장소
-│       └── SPEC-XXX/          # 개별 명세서
-│           └── spec.md        # EARS 형식 명세서
-├── .mcp.json                   # MCP 서버 설정
-├── .gitignore                  # Git 무시 파일
-├── CLAUDE.md                   # Claude Code 실행 지시문
-└── src/                        # 애플리케이션 소스 코드 (추가 예정)
+├── .claude/                        # Claude Code 설정 및 커스터마이징
+│   ├── agents/                     # 서브에이전트 정의 (20개)
+│   ├── commands/                   # 슬래시 명령어 (10개)
+│   ├── hooks/                      # 이벤트 기반 자동화
+│   ├── output-styles/              # 출력 스타일 테마
+│   └── skills/                     # 모델 호출 기반 스킬 라이브러리
+├── .moai/                          # MoAI-ADK 프레임워크 설정
+│   ├── config/                     # 설정 파일
+│   │   ├── config.yaml            # 메인 설정
+│   │   └── sections/              # 모듈화된 설정
+│   ├── docs/                       # 생성된 문서
+│   ├── logs/                       # 런타임 로그 (30일 보관)
+│   ├── memory/                     # 세션 메모리
+│   ├── project/                    # 프로젝트 문서
+│   │   ├── product.md             # 제품 개요
+│   │   ├── structure.md           # 구조 설명 (본 파일)
+│   │   └── tech.md                # 기술 스택
+│   ├── specs/                      # 명세서 저장소
+│   └── temp/                       # 임시 파일 (7일 보관)
+├── .mcp.json                       # MCP 서버 설정
+├── .gitignore                      # Git 무시 파일
+├── CLAUDE.md                       # Claude Code 실행 지시문
+├── prisma/                         # Prisma ORM 설정
+│   ├── schema.prisma               # 데이터베이스 스키마
+│   └── migrations/                 # 마이그레이션 파일
+├── public/                         # 정적 파일
+│   └── images/                     # 이미지 리소스
+├── src/                            # 애플리케이션 소스 코드
+│   ├── app/                        # Next.js App Router
+│   │   ├── api/                    # API 라우트
+│   │   │   ├── auth/              # 인증 API
+│   │   │   │   ├── [...nextauth]/  # NextAuth 핸들러
+│   │   │   │   ├── signin/route.ts
+│   │   │   │   ├── signup/route.ts
+│   │   │   │   └── signout/route.ts
+│   │   │   ├── inbody/            # InBody API
+│   │   │   │   ├── upload/route.ts
+│   │   │   ├── hybrid-upload/route.ts # 하이브리드 OCR + AI (NEW)
+│   │   │   ├── vision-upload/route.ts  # Vision API 직접 추출 (NEW)
+│   │   │   ├── extraction/[id]/route.ts # 추출 결과 조회 (NEW)
+│   │   │   ├── retry-extraction/[id]/route.ts # 재시도 (NEW)
+│   │   │   ├── history/route.ts
+│   │   │   └── [id]/route.ts
+│   │   └── health/            # AI 건강 분석 API (NEW)
+│   │       ├── analyze/[recordId]/route.ts
+│   │       └── analysis/[recordId]/route.ts
+│   │   ├── auth/                  # 인증 페이지
+│   │   │   ├── signin/page.tsx
+│   │   │   └── signup/page.tsx
+│   │   ├── inbody/                # InBody 대시보드
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx             # 루트 레이아웃
+│   │   └── page.tsx               # 홈페이지
+│   ├── components/                 # React 컴포넌트
+│   │   ├── ai/                    # AI 건강 분석 컴포넌트 (NEW)
+│   │   │   ├── health-analysis-result.tsx
+│   │   │   ├── health-status-card.tsx
+│   │   │   ├── risk-factor-list.tsx
+│   │   │   ├── recommendation-card.tsx
+│   │   │   └── warning-alert.tsx
+│   │   ├── auth/                  # 인증 컴포넌트
+│   │   │   ├── signin-form.tsx
+│   │   │   └── signup-form.tsx
+│   │   ├── inbody/                # InBody 컴포넌트
+│   │   │   ├── dashboard-layout.tsx
+│   │   │   ├── inbody-dashboard.tsx
+│   │   │   ├── upload/
+│   │   │   │   └── upload-section.tsx
+│   │   │   ├── result/
+│   │   │   │   └── result-view.tsx
+│   │   │   ├── charts/
+│   │   │   │   ├── score-chart.tsx
+│   │   │   │   ├── weight-chart.tsx
+│   │   │   │   ├── bmi-chart.tsx
+│   │   │   │   └── body-composition-chart.tsx
+│   │   │   └── history/
+│   │   │       ├── history-list.tsx
+│   │   │       ├── history-filters.tsx
+│   │   │       ├── history-item.tsx
+│   │   │       └── history-pagination.tsx
+│   │   ├── providers/             # Context Provider
+│   │   │   ├── session-provider.tsx (NEW)
+│   │   │   └── query-provider.tsx
+│   │   └── ui/                    # shadcn/ui 컴포넌트
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── input.tsx
+│   │       ├── progress.tsx
+│   │       └── ...
+│   ├── lib/                        # 핵심 비즈니스 로직
+│   │   ├── api/                   # API 클라이언트
+│   │   │   └── inbody-api.ts
+│   │   ├── prompts/               # AI 프롬프트 (NEW)
+│   │   │   └── health-analysis.ts
+│   │   ├── types/                 # TypeScript 타입
+│   │   │   ├── inbody.ts
+│   │   │   ├── extraction/         # OCR 추출 타입 (NEW)
+│   │   │   │   └── extraction.ts
+│   │   │   └── index.ts
+│   │   ├── auth.ts                # NextAuth 설정
+│   │   ├── ai-service.ts          # AI 건강 분석 서비스 (NEW)
+│   │   ├── ai-schemas.ts          # AI Zod 스키마 (NEW)
+│   │   ├── client-ocr.ts          # 클라이언트 OCR (NEW)
+│   │   ├── multi-stage-extractor.ts # 멀티 스테이지 추출 (NEW)
+│   │   ├── extraction-error-handler.ts # OCR 오류 처리 (NEW)
+│   │   ├── ocr-service.ts         # Tesseract.js OCR
+│   │   ├── parser-service.ts      # OCR 데이터 파싱
+│   │   ├── password.ts            # 비밀번호 해싱
+│   │   ├── prisma.ts              # Prisma 클라이언트
+│   │   ├── validations.ts         # Zod 검증 스키마
+│   │   ├── inbody.ts              # InBody 타입 정의
+│   │   ├── ocr-config.ts          # OCR 설정 (NEW)
+│   │   ├── pattern-library.ts     # 정규식 패턴 라이브러리 (NEW)
+│   │   └── image-validator.ts     # 이미지 검증
+│   ├── middleware.ts              # NextAuth 인증 미들웨어
+│   └── styles/                    # 스타일시트
+│       └── globals.css
+├── tests/                          # 테스트 파일 (Vitest)
+│   ├── unit/                      # 단위 테스트
+│   ├── integration/               # 통합 테스트
+│   └── e2e/                       # E2E 테스트
+├── next.config.js                 # Next.js 설정
+├── tailwind.config.js             # Tailwind CSS 설정
+├── tsconfig.json                  # TypeScript 설정
+├── vitest.config.ts               # Vitest 설정
+├── package.json                   # 프로젝트 의존성
+└── README.md                      # 프로젝트 설명
 ```
 
 ## 주요 디렉토리 설명
 
-### `.claude/` - Claude Code 설정
+### `src/app/` - Next.js App Router
 
-Claude Code의 동작을 제어하는 모든 커스터마이징 파일이 포함됩니다.
+페이지 및 API 라우트를 포함하는 Next.js 16 App Router 구조입니다.
 
-#### `agents/` - 서브에이전트 정의
+#### `api/` - API 라우트
 
-20개의 전문화된 에이전트가 정의된 마크다운 파일들입니다. 각 에이전트는 YAML 프론트매터와 시스템 프롬프트로 구성됩니다.
+**인증 API** (`api/auth/`)
 
-**매니저 에이전트 (8개)**
+- `[...nextauth]/route.ts`: NextAuth 핸들러
+- `signin/route.ts`: 로그인 처리
+- `signup/route.ts`: 회원가입 처리
+- `signout/route.ts`: 로그아웃 처리
 
-- `manager-spec`: EARS 명세서 생성
-- `manager-tdd`: TDD 사이클 실행
-- `manager-docs`: 문서 생성 및 동기화
-- `manager-quality`: 품질 검증 및 TRUST 5 적용
-- `manager-git`: Git 워크플로우 관리
-- `manager-project`: 프로젝트 구성 관리
-- `manager-strategy`: 시스템 설계 및 아키텍처
-- `manager-claude-code`: Claude Code 최적화
+**InBody API** (`api/inbody/`)
 
-**전문가 에이전트 (8개)**
+- `upload/route.ts`: 이미지 업로드 및 OCR 처리
+- `hybrid-upload/route.ts`: 하이브리드 OCR + AI 추출 (NEW)
+- `vision-upload/route.ts`: Vision API 직접 추출 (NEW)
+- `extraction/[id]/route.ts`: 추출 결과 조회 (NEW)
+- `retry-extraction/[id]/route.ts`: 추출 재시도 (NEW)
+- `history/route.ts`: 기록 목록 조회 (페이지네이션)
+- `[id]/route.ts`: 특정 기록 삭제
 
-- `expert-backend`: 백엔드 API 개발
-- `expert-frontend`: 프론트엔드 UI 개발
-- `expert-security`: 보안 검토 및 구현
-- `expert-devops`: 인프라 및 배포
-- `expert-performance`: 성능 최적화
-- `expert-debug`: 디버깅 및 문제 해결
-- `expert-testing`: 테스트 전략 및 구현
-- `expert-refactoring`: 리팩토링 및 코드 개선
+**AI 건강 분석 API** (`api/health/`) (NEW)
 
-**빌더 에이전트 (4개)**
+- `analyze/[recordId]/route.ts`: AI 분석 요청
+- `analysis/[recordId]/route.ts`: AI 분석 결과 조회
 
-- `builder-agent`: 새 에이전트 생성
-- `builder-command`: 새 명령어 생성
-- `builder-skill`: 새 스킬 생성
-- `builder-plugin`: 새 플러그인 생성
+#### 페이지 디렉토리
 
-#### `commands/` - 슬래시 명령어
+- `auth/`: 인증 페이지 (로그인, 회원가입)
+- `inbody/`: InBody 대시보드 페이지
+- `layout.tsx`: 루트 레이아웃 (공통 헤더, 푸터)
+- `page.tsx`: 홈페이지
 
-사용자가 `/`로 시작하는 명령어를 입력할 때 실행되는 스크립트들입니다.
+### `src/components/` - React 컴포넌트
 
-**핵심 명령어**
+재사용 가능한 UI 컴포넌트가 포함됩니다.
 
-- `0-project`: 프로젝트 구성 초기화 및 관리
-- `1-plan`: 명세서 생성 (EARS 형식)
-- `2-run`: TDD 구현 실행
-- `3-sync`: 문서 동기화
-- `9-feedback`: 개선 피드백 제출
+#### 컴포넌트 분류
 
-**유틸리티 명령어**
+**AI 건강 분석 컴포넌트** (`ai/`) (NEW)
 
-- `alfred`: 지능형 작업 라우팅
-- `fix`: 빠른 수정 및 루프
-- `loop`: 반복 작업 자동화
-- `cancel-loop`: 실행 중인 루프 중지
+- `health-analysis-result.tsx`: AI 분석 결과 컨테이너
+- `health-status-card.tsx`: 건강 상태 카드
+- `risk-factor-list.tsx`: 위험 요소 목록
+- `recommendation-card.tsx`: 추천 사항 카드
+- `warning-alert.tsx`: 주의 사항 알림
 
-#### `hooks/` - 이벤트 기반 자동화
+**인증 컴포넌트** (`auth/`)
 
-특정 이벤트가 발생할 때 자동으로 실행되는 Python 스크립트들입니다.
+- `signin-form.tsx`: 로그인 폼
+- `signup-form.tsx`: 회원가입 폼
 
-**세션 훅**
+**InBody 컴포넌트** (`inbody/`)
 
-- `session_start__show_project_info.py`: 세션 시작 시 프로젝트 정보 표시
-- `session_end__auto_cleanup.py`: 세션 종료 시 자동 정리
+- `dashboard-layout.tsx`: 대시보드 레이아웃
+- `inbody-dashboard.tsx`: 메인 대시보드
+- `upload/upload-section.tsx`: 업로드 영역
+- `result/result-view.tsx`: 결과 표시
 
-**툴 훅**
+**차트 컴포넌트** (`inbody/charts/`)
 
-- `pre_tool__security_guard.py`: 보안 검사 사전 실행
-- `post_tool__linter.py`: 린터 사후 실행
-- `post_tool__code_formatter.py`: 코드 포맷터 사후 실행
-- `post_tool__ast_grep_scan.py`: AST 그랩 스캔 사후 실행
+- `score-chart.tsx`: 건강 점수 차트
+- `weight-chart.tsx`: 체중 차트
+- `bmi-chart.tsx`: BMI 차트
+- `body-composition-chart.tsx`: 체성분 구성 차트
 
-**루프 컨트롤 훅**
+**기록 관리 컴포넌트** (`inbody/history/`)
 
-- `stop__loop_controller.py`: 루프 제어 로직
+- `history-list.tsx`: 기록 목록
+- `history-filters.tsx`: 필터 UI
+- `history-item.tsx`: 개별 기록 아이템
+- `history-pagination.tsx`: 페이지네이션
 
-#### `skills/` - 모델 호출 기반 확장
+**Provider** (`providers/`)
 
-Claude 모델이 상황에 따라 동적으로 로드하는 지식 베이스입니다.
+- `session-provider.tsx`: NextAuth 세션 Provider (NEW)
+- `query-provider.tsx`: TanStack Query Provider
 
-**핵심 스킬**
+**UI 컴포넌트** (`ui/`)
 
-- `moai-foundation-claude`: Claude Code 작성 키트
-- `moai-foundation-core`: SPEC 시스템 및 핵심 워크플로우
-- `moai-foundation-philosopher`: 전략적 사고 프레임워크
+- shadcn/ui 기반 컴포넌트 (Button, Card, Input, Progress 등)
 
-**도메인 스킬**
+### `src/lib/` - 비즈니스 로직
 
-- `moai-domain-backend`: 백엔드 개발 패턴
-- `moai-domain-frontend`: 프론트엔드 개발 패턴
-- `moai-domain-database`: 데이터베이스 설계 및 최적화
-- `moai-domain-uiux`: UI/UX 설계 및 접근성
+애플리케이션의 핵심 로직이 포함됩니다.
 
-**라이브러리 스킬**
+#### 모듈 구조
 
-- `moai-library-mermaid`: Mermaid 다이어그램 생성
-- `moai-library-nextra`: Nextra 문서 사이트 구축
+**API 클라이언트** (`api/`)
 
-**워크플로우 스킬**
+- `inbody-api.ts`: InBody API 클라이언트
 
-- `moai-workflow-docs`: 문서 생성 워크플로우
-- `moai-workflow-project`: 프로젝트 관리
-- `moai-workflow-jit-docs`: 실시간 문서 로딩
+**AI 프롬프트** (`prompts/`) (NEW)
 
-### `.moai/` - 프레임워크 설정
+- `health-analysis.ts`: AI 건강 분석 프롬프트
 
-MoAI-ADK 프레임워크의 핵심 설정과 생성된 아티팩트가 저장됩니다.
+**타입 정의** (`types/`)
 
-#### `config/` - 설정 관리
+- `inbody.ts`: InBody 관련 타입
 
-모듈화된 YAML 설정 파일들로 관리됩니다.
+**핵심 로직**
 
-**핵심 설정 파일**
+- `auth.ts`: NextAuth 설정 (JWT Strategy)
+- `ai-service.ts`: AI 건강 분석 서비스 (NEW)
+- `ai-schemas.ts`: AI 관련 Zod 스키마 (NEW)
+- `client-ocr.ts`: 클라이언트 측 OCR 처리 (NEW)
+- `multi-stage-extractor.ts`: 멀티 스테이지 추출 시스템 (NEW)
+- `extraction-error-handler.ts`: OCR 오류 처리 및 재시도 (NEW)
+- `ocr-service.ts`: Tesseract.js OCR 처리
+- `parser-service.ts`: OCR 데이터 파싱
+- `password.ts`: 비밀번호 해싱
+- `prisma.ts`: Prisma 클라이언트
+- `validations.ts`: Zod 검증 스키마
+- `inbody.ts`: InBody 타입 정의
+- `ocr-config.ts`: OCR 설정 및 전처리 (NEW)
+- `pattern-library.ts`: 정규식 패턴 라이브러리 (NEW)
+- `image-validator.ts`: 이미지 검증
 
-- `config.yaml`: 메인 설정 파일 (모든 섹션 참조)
-- `sections/user.yaml`: 사용자 이름 및 개인 설정
-- `sections/language.yaml`: 언어 설정 (대화, 코드, 문서)
-- `sections/project.yaml`: 프로젝트 메타데이터
-- `sections/git-strategy.yaml`: Git 워크플로우 설정
-- `sections/quality.yaml`: TRUST 5 품질 설정
-- `sections/system.yaml`: 시스템 버전 및 업데이트
+### `prisma/` - 데이터베이스 스키마
 
-#### `project/` - 프로젝트 문서
+Prisma ORM 설정과 데이터베이스 스키마가 포함됩니다.
 
-프로젝트 관련 문서가 저장됩니다.
+#### 스키마 정의
 
-- `product.md`: 제품 개요 및 기능 설명
-- `structure.md`: 프로젝트 구조 설명 (본 파일)
-- `tech.md`: 기술 스택 및 프레임워크 상세
+- **User**: 사용자 계정
+- **Account**: OAuth 계정 연동
+- **Session**: 세션 정보
+- **VerificationToken**: 이메일 인증 토큰
+- **InBodyRecord**: InBody 체성분 기록
+- **HealthAnalysis**: AI 건강 분석 결과 (NEW)
 
-#### `specs/` - 명세서 저장소
+### `tests/` - 테스트 파일
 
-EARS 형식으로 작성된 기능 명세서들이 저장됩니다.
+Vitest를 사용하는 테스트 코드가 포함됩니다.
 
-```
-specs/
-├── SPEC-001/
-│   └── spec.md
-├── SPEC-002/
-│   └── spec.md
-└── ...
-```
+#### 테스트 분류
 
-#### 문서 관리 시스템
+- `unit/`: 단위 테스트 (컴포넌트, 함수)
+- `integration/`: 통합 테스트 (API, 데이터베이스)
+- `e2e/`: E2E 테스트 (사용자 시나리오)
 
-프레임워크는 런타임 데이터와 문서를 명확히 분리합니다.
+## API 라우트 맵
 
-- `docs/`: 생성된 문서 (영구 보관)
-- `logs/`: 런타임 로그 (30일 자동 삭제)
-- `temp/`: 임시 파일 (7일 자동 삭제)
-- `cache/`: 캐시 파일 (30일 자동 삭제)
+| 경로 | 메서드 | 목적 | 인증 필요 |
+|------|--------|------|-----------|
+| `/api/auth/[...nextauth]` | GET/POST | NextAuth 핸들러 | - |
+| `/api/auth/signin` | POST | 로그인 | - |
+| `/api/auth/signup` | POST | 회원가입 | - |
+| `/api/auth/signout` | POST | 로그아웃 | - |
+| `/api/inbody/upload` | POST | InBody 업로드 + OCR | Yes |
+| `/api/inbody/hybrid-upload` | POST | 하이브리드 OCR + AI 추출 | Yes (NEW) |
+| `/api/inbody/vision-upload` | POST | Vision API 직접 추출 | Yes (NEW) |
+| `/api/inbody/extraction/[id]` | GET | 추출 결과 조회 | Yes (NEW) |
+| `/api/inbody/retry-extraction/[id]` | POST | 추출 재시도 | Yes (NEW) |
+| `/api/inbody/history` | GET | 기록 목록 (페이지네이션) | Yes |
+| `/api/inbody/[id]` | DELETE | 기록 삭제 | Yes |
+| `/api/health/analyze/[recordId]` | POST | AI 분석 요청 | Yes |
+| `/api/health/analysis/[recordId]` | GET | AI 분석 결과 조회 | Yes |
 
-### `.mcp.json` - MCP 서버 설정
+## 데이터베이스 모델
 
-Model Context Protocol 서버들의 연결 설정을 포함합니다.
+### User 모델
 
-```json
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"]
-    }
-  },
-  "staggeredStartup": {
-    "enabled": true,
-    "delayMs": 500,
-    "connectionTimeout": 15000
-  }
+사용자 인증 정보를 저장합니다.
+
+```prisma
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String    // bcrypt hashed password
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  inbodyRecords InBodyRecord[]
 }
 ```
 
-현재 Context7 MCP 서버가 구성되어 있어 최신 공식 문서를 실시간으로 조회할 수 있습니다.
+### InBodyRecord 모델
 
-### `CLAUDE.md` - 실행 지시문
+InBody 체성분 기록을 저장합니다.
 
-Alfred(오케스트레이터)의 동작을 제어하는 핵심 지시문입니다.
+```prisma
+model InBodyRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  measuredAt        DateTime
 
-- Alfred의 3단계 실행 모델 정의
-- 에이전트 위임 패턴 명시
-- 20개 에이전트 호출 가이드
-- 언어 응답 규칙
-- 토큰 관리 전략
-- 보안 샌드박싱 가이드
+  // 개인정보
+  name              String?
+  gender            String?
+  age               Int?
+  height            Float?
 
-### `src/` - 애플리케이션 소스 코드
+  // 체성분 데이터
+  weight            Float?
+  bodyFatPercentage Float?
+  muscle            Float?
+  protein           Float?
+  bodyWater         Float?
+  skeletalMuscle    Float?
 
-실제 애플리케이션 코드가 추가될 디렉토리입니다. 현재는 비어 있습니다.
+  // 신체 점수
+  bodyScore         Int?
+  scoreDescription  String?
 
-**예상 구조** (프로젝트 타입에 따라 달라집니다)
+  // 비만 판정
+  bmi               Float?
+  bmiStatus         String?
 
+  // 체중 조절
+  weightControl     String?
+
+  // 신체 유형
+  bodyType          String?
+
+  // 생체 임피던스
+  bioimpedance      String?
+
+  // 기타 지표
+  smi               Float?
+  calorieNeeds      Int?
+
+  // 부위별 분석 (JSON)
+  regionalAnalysis  String?
+
+  // OCR 메타데이터
+  ocrConfidence     Float?
+  ocrProcessedAt    DateTime @default(now())
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // AI 분석 1:1 관계
+  healthAnalysis    HealthAnalysis?
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt])
+}
 ```
-src/
-├── backend/              # 백엔드 코드
-│   ├── api/             # API 엔드포인트
-│   ├── models/          # 데이터 모델
-│   ├── services/        # 비즈니스 로직
-│   └── tests/           # 테스트 코드
-├── frontend/            # 프론트엔드 코드
-│   ├── components/      # UI 컴포넌트
-│   ├── pages/           # 페이지
-│   └── styles/          # 스타일시트
-└── shared/              # 공유 코드
-    ├── types/           # 타입 정의
-    └── utils/           # 유틸리티 함수
+
+### HealthAnalysis 모델 (NEW)
+
+AI 건강 분석 결과를 저장합니다.
+
+```prisma
+model HealthAnalysis {
+  id                String   @id @default(cuid())
+  inbodyRecordId    String   @unique
+  inbodyRecord      InBodyRecord @relation(fields: [inbodyRecordId], references: [id], onDelete: Cascade)
+
+  // AI 분석 결과
+  healthStatus      String   // 전체 건강 상태
+  healthScore       Int      // 건강 점수 (0-100)
+  riskFactors       String   // 위험 요소 목록 (JSON)
+  recommendations   String   // 추천 사항 (JSON)
+  warnings          String   // 주의 사항 (JSON)
+
+  // AI 메타데이터
+  modelVersion      String   // AI 모델 버전
+  confidence        Float?   // 분석 신뢰도
+  analysisToken     String?  // API 토큰
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([inbodyRecordId])
+}
 ```
 
 ## 주요 파일 위치 참조
 
 | 파일 | 경로 | 용도 |
 |------|------|------|
-| 메인 설정 | `.moai/config/config.yaml` | 프레임워크 전체 설정 |
-| 사용자 설정 | `.moai/config/sections/user.yaml` | 사용자 이름 및 개인 설정 |
-| 언어 설정 | `.moai/config/sections/language.yaml` | 대화 및 코드 언어 |
-| 품질 설정 | `.moai/config/sections/quality.yaml` | TRUST 5 품질 기준 |
-| 실행 지시문 | `CLAUDE.md` | Alfred 오케스트레이션 규칙 |
-| MCP 설정 | `.mcp.json` | Context7 서버 연결 |
-| 프로젝트 문서 | `.moai/project/` | 제품, 구조, 기술 문서 |
+| 홈페이지 | `src/app/page.tsx` | 랜딩 페이지 |
+| 인증 설정 | `src/lib/auth.ts` | NextAuth 설정 |
+| 세션 Provider | `src/components/providers/session-provider.tsx` | 세션 컨텍스트 |
+| 미들웨어 | `src/middleware.ts` | 인증 미들웨어 |
+| 루트 레이아웃 | `src/app/layout.tsx` | 공통 레이아웃 |
+| AI 서비스 | `src/lib/ai-service.ts` | AI 건강 분석 |
+| AI 스키마 | `src/lib/ai-schemas.ts` | AI 데이터 검증 |
+| AI 프롬프트 | `src/lib/prompts/health-analysis.ts` | AI 프롬프트 |
+| 클라이언트 OCR | `src/lib/client-ocr.ts` | 브라우저 OCR |
+| OCR 서비스 | `src/lib/ocr-service.ts` | 이미지 텍스트 추출 |
+| 파서 서비스 | `src/lib/parser-service.ts` | OCR 데이터 파싱 |
+| InBody 스키마 | `src/lib/inbody.ts` | 데이터 검증 |
+| DB 스키마 | `prisma/schema.prisma` | 데이터베이스 모델 |
+| Next.js 설정 | `next.config.js` | 프레임워크 설정 |
+| Tailwind 설정 | `tailwind.config.js` | 스타일 설정 |
+| TypeScript 설정 | `tsconfig.json` | 타입 설정 |
+| Vitest 설정 | `vitest.config.ts` | 테스트 설정 |
+
+## 아키텍처 패턴
+
+### React Server Components + Client Components
+
+- Server Components: SEO, 초기 렌더링, 보안 데이터
+- Client Components: 인터랙티브 UI, 상태 관리
+
+### API Routes
+
+- RESTful 엔드포인트
+- 인증된 요청 처리
+- AI 서비스 통합
+
+### AI 서비스 아키텍처
+
+```
+사용자 → InBody 기록 업로드 → OCR 처리 → 데이터 저장
+                                              ↓
+                                    AI 분석 요청 API
+                                              ↓
+                                    Claude AI API 호출
+                                              ↓
+                                    분석 결과 DB 저장
+                                              ↓
+                                    결과 조회 및 표시
+```
+
+### 데이터 흐름
+
+```
+사용자 → UI 컴포넌트 → API 클라이언트 → API 라우트
+                                    ↓
+                            비즈니스 로직 (lib/)
+                                    ↓
+                        ┌───────────┴───────────┐
+                        ↓                       ↓
+                    Prisma ORM              Claude AI
+                        ↓                       ↓
+                   PostgreSQL              분석 결과
+                        ↓                       ↓
+                        └───────────┬───────────┘
+                                    ↓
+                            사용자에게 표시
+```
 
 ---
 
-버전: 1.0.0
-최종 업데이트: 2026-01-14
-프레임워크: MoAI-ADK v1.0.0
+버전: 1.2.0
+최종 업데이트: 2026-01-17
+프레임워크: Next.js 16.0.0 App Router
+AI 모델: claude-3-5-sonnet-20241022
+OCR 정확도: 95% (멀티 스테이지 추출)

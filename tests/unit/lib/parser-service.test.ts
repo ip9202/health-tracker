@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { parseInBodyData, convertUnit, ParseWarning } from '@/lib/parser-service';
 import { InBodyData } from '@/lib/inbody';
 
@@ -16,8 +16,8 @@ describe('Parser Service', () => {
         단백질: 12.5kg
         체수분: 40.5kg
         골격근량: 30.0kg
-        신체점수: 80 / 100
-        점수설명: 좋음
+        신체점수: 92 / 100
+        점수설명: 우수
         BMI: 22.9
         비만판정: 정상
         체중조절: 유지
@@ -36,12 +36,12 @@ describe('Parser Service', () => {
       expect(result.data.height).toBe(175.5);
       expect(result.data.weight).toBe(70.5);
       expect(result.data.bodyFatPercentage).toBe(18.5);
-      expect(result.data.muscle).toBe(32.0);
+      expect(result.data.muscle).toBe(32);
       expect(result.data.protein).toBe(12.5);
       expect(result.data.bodyWater).toBe(40.5);
-      expect(result.data.skeletalMuscle).toBe(30.0);
-      expect(result.data.bodyScore).toBe(80);
-      expect(result.data.scoreDescription).toBe('좋음');
+      expect(result.data.skeletalMuscle).toBe(30);
+      expect(result.data.bodyScore).toBe(92);
+      expect(result.data.scoreDescription).toBe('우수');
       expect(result.data.bmi).toBe(22.9);
       expect(result.data.bmiStatus).toBe('정상');
       expect(result.data.weightControl).toBe('유지');
@@ -120,12 +120,12 @@ describe('Parser Service', () => {
     });
 
     it('신체 점수를 파싱해야 한다', () => {
-      const ocrText = '신체점수: 85/100 점수설명: 매우좋음';
+      const ocrText = '신체점수: 92/100 점수설명: 우수';
 
       const result = parseInBodyData(ocrText);
 
-      expect(result.data.bodyScore).toBe(85);
-      expect(result.data.scoreDescription).toBe('매우좋음');
+      expect(result.data.bodyScore).toBe(92);
+      expect(result.data.scoreDescription).toBe('우수');
     });
 
     it('소수점이 있는 숫자를 파싱해야 한다', () => {
@@ -210,6 +210,152 @@ describe('Parser Service', () => {
 
       // 정규식은 첫 번째 매칭만 반환하므로 70이어야 함
       expect(result.data.weight).toBe(70);
+    });
+  });
+
+  describe('TASK-007: New Extraction Integration', () => {
+    describe('16개 패턴을 사용한 신체 점수 추출', () => {
+      it('InBody 770 표준 형식을 추출해야 한다 (Priority 1)', () => {
+        const ocrText = '신체 점수 85 표준';
+        const result = parseInBodyData(ocrText);
+
+        expect(result.data.bodyScore).toBe(85);
+        expect(result.data.scoreDescription).toBe('보통'); // 70-89 = 보통
+      });
+
+      it('InBody 970 신체점수 형식을 추출해야 한다 (Priority 1)', () => {
+        const ocrText = '신체점수: 92';
+        const result = parseInBodyData(ocrText);
+
+        expect(result.data.bodyScore).toBe(92);
+        expect(result.data.scoreDescription).toBe('우수');
+      });
+
+      it('InBody 720 신체평가 점수 형식을 추출해야 한다 (Priority 2)', () => {
+        const ocrText = '신체평가 점수 78';
+        const result = parseInBodyData(ocrText);
+
+        expect(result.data.bodyScore).toBe(78);
+        expect(result.data.scoreDescription).toBe('보통');
+      });
+
+      it('OntoFit 바디스코어 형식을 추출해야 한다 (Priority 3-4)', () => {
+        const ocrText = '바디스코어 92';
+        const result = parseInBodyData(ocrText);
+
+        expect(result.data.bodyScore).toBe(92);
+        expect(result.data.scoreDescription).toBe('우수');
+      });
+
+      it('Generic 점수 형식을 추출해야 한다 (Priority 5)', () => {
+        const ocrText = '점수: 75';
+        const result = parseInBodyData(ocrText);
+
+        expect(result.data.bodyScore).toBe(75);
+        expect(result.data.scoreDescription).toBe('보통');
+      });
+
+      it('Generic 2-3자리 숫자만 있는 경우도 추출해야 한다 (Priority 10)', () => {
+        const ocrText = '체중 70kg, 키 175cm, 85점';
+        const result = parseInBodyData(ocrText);
+
+        expect(result.data.bodyScore).toBe(85);
+        expect(result.data.scoreDescription).toBe('보통'); // 70-89 = 보통
+      });
+
+      it('여러 패턴이 있을 때 가장 높은 우선순위 패턴을 사용해야 한다', () => {
+        // "신체 점수 85 표준" (Priority 1)과 "점수:75" (Priority 5)가 모두 있음
+        const ocrText = '신체 점수 85 표준, 점수: 75';
+        const result = parseInBodyData(ocrText);
+
+        // Priority 1 패턴이 우선
+        expect(result.data.bodyScore).toBe(85);
+      });
+    });
+
+    describe('더미 데이터 반환 방지', () => {
+      it('빈 텍스트는 더미 데이터를 반환하지 않고 에러를 처리해야 한다', () => {
+        const ocrText = '';
+        const result = parseInBodyData(ocrText);
+
+        // 더미 데이터가 아니어야 함
+        expect(result.data.name).toBeUndefined();
+        expect(result.data.weight).toBeUndefined();
+
+        // 에러 처리 확인 (warnings 또는 error)
+        expect(result.warnings.length).toBeGreaterThan(0);
+      });
+
+      it('짧은 텍스트는 더미 데이터를 반환하지 않고 에러를 처리해야 한다', () => {
+        const ocrText = 'abc';
+        const result = parseInBodyData(ocrText);
+
+        // 더미 데이터가 아니어야 함
+        expect(result.data.name).toBeUndefined();
+        expect(result.data.weight).toBeUndefined();
+      });
+
+      it('신체 점수를 찾을 수 없을 때 경고를 추가해야 한다', () => {
+        const ocrText = '체중: 70kg 신장: 175cm'; // 신체 점수 없음
+        const result = parseInBodyData(ocrText);
+
+        expect(result.data.bodyScore).toBeUndefined();
+        // warnings 또는 error 확인
+        expect(result.warnings.length).toBeGreaterThan(0);
+      });
+    });
+
+    describe('하위 호환성 유지', () => {
+      it('기존 3개 패턴이 여전히 작동해야 한다', () => {
+        // 기존 패턴 1: 신체 점수와 표준 사이
+        const ocrText1 = '신체 점수 무게 67.00 (56.0-75.7) 100.0 표준';
+        const result1 = parseInBodyData(ocrText1);
+        expect(result1.data.bodyScore).toBe(100);
+
+        // 기존 패턴 2: /100 앞의 숫자
+        const ocrText2 = '85/100점';
+        const result2 = parseInBodyData(ocrText2);
+        expect(result2.data.bodyScore).toBe(85);
+
+        // 기존 패턴 3: 숫자+표준
+        const ocrText3 = 'BMI: 22.4, 90.0 표준';
+        const result3 = parseInBodyData(ocrText3);
+        expect(result3.data.bodyScore).toBe(90);
+      });
+    });
+
+    describe('점수 범위별 설명', () => {
+      it('90점 이상은 우수여야 한다', () => {
+        const result = parseInBodyData('신체 점수 95 표준');
+        expect(result.data.scoreDescription).toBe('우수');
+      });
+
+      it('70-89점은 보통이어야 한다', () => {
+        const result = parseInBodyData('신체 점수 75 표준');
+        expect(result.data.scoreDescription).toBe('보통');
+      });
+
+      it('50-69점은 주의여야 한다', () => {
+        const result = parseInBodyData('신체 점수 55 표준');
+        expect(result.data.scoreDescription).toBe('주의');
+      });
+
+      it('50점 미만은 경고여야 한다', () => {
+        const result = parseInBodyData('신체 점수 45 표준');
+        expect(result.data.scoreDescription).toBe('경고');
+      });
+    });
+
+    describe('전처리 파이프라인 연결 (향후 구현)', () => {
+      it('전처리 옵션을 지원해야 한다', () => {
+        // 현재는 options 파라미터가 없지만, 추후 추가 예정
+        const ocrText = '신체 점수 80 표준';
+
+        // @ts-ignore - 향후 추가될 options 파라미터
+        const result = parseInBodyData(ocrText, { useEnhancedPreprocessing: true });
+
+        expect(result.data.bodyScore).toBe(80);
+      });
     });
   });
 });

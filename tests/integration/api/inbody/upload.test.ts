@@ -4,16 +4,15 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest } from 'next/server';
 
 // Mock dependencies
-const mockImageValidationError = {
-  UNSUPPORTED_FORMAT: 'UNSUPPORTED_FORMAT',
-  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
-  INVALID_MAGIC_BYTES: 'INVALID_MAGIC_BYTES',
-  EMPTY_FILE: 'EMPTY_FILE',
-} as const;
-
+// TAG-FE-QA-001: Mock 설정 (vi.mock 호이스팅으로 인해 인라인 정의)
 vi.mock('@/lib/image-validator', () => ({
   validateImageFile: vi.fn(),
-  ImageValidationError: mockImageValidationError,
+  ImageValidationError: {
+    UNSUPPORTED_FORMAT: 'UNSUPPORTED_FORMAT',
+    FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+    INVALID_MAGIC_BYTES: 'INVALID_MAGIC_BYTES',
+    EMPTY_FILE: 'EMPTY_FILE',
+  },
 }));
 
 vi.mock('@/lib/ocr-service', () => ({

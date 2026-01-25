@@ -15,11 +15,13 @@ const PersonalInfoSchema = z.object({
   gender: z.enum(['male', 'female', 'other']).optional(),
   age: z.number().int().min(0).max(150).optional(),
   height: z.number().positive().optional(), // cm
+  measuredAt: z.date().optional(), // 측정일
 });
 
 // 체성분 데이터 스키마
 const BodyCompositionSchema = z.object({
   weight: z.number().positive().optional(), // kg
+  bodyFat: z.number().nonnegative().optional(), // 체지방량 (kg)
   bodyFatPercentage: z.number().min(0).max(100).optional(), // %
   muscle: z.number().nonnegative().optional(), // kg
   protein: z.number().nonnegative().optional(), // kg
@@ -49,20 +51,9 @@ const BodyTypeSchema = z.object({
   bodyType: z.string().optional(),
 });
 
-// 생체 임피던스 스키마
-const BioimpedanceSchema = z.object({
-  bioimpedance: z.string().optional(),
-});
-
 // 기타 지표 스키마
 const OtherMetricsSchema = z.object({
-  smi: z.number().nonnegative().optional(), // Skeletal Muscle Index
   calorieNeeds: z.number().int().positive().optional(), // kcal/day
-});
-
-// 부위별 분석 스키마 (JSON 문자열)
-const RegionalAnalysisSchema = z.object({
-  regionalAnalysis: z.string().optional(),
 });
 
 // 전체 인바디 데이터 스키마
@@ -85,14 +76,8 @@ export const InBodyDataSchema = z.object({
   // 신체 유형
   ...BodyTypeSchema.shape,
 
-  // 생체 임피던스
-  ...BioimpedanceSchema.shape,
-
   // 기타 지표
   ...OtherMetricsSchema.shape,
-
-  // 부위별 분석
-  ...RegionalAnalysisSchema.shape,
 });
 
 // 타입 추출
