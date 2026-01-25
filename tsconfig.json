@@ -27,7 +27,8 @@
       ]
     },
     "target": "ES2022",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["vitest/globals"]
   },
   "include": [
     "next-env.d.ts",
@@ -37,6 +38,9 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests",
+    "test-results",
+    "playwright-report"
   ]
 }
