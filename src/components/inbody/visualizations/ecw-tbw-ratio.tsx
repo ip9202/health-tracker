@@ -281,8 +281,6 @@ export function ECWTBWRatio({ ecw, tbw }: ECWTBWRatioProps) {
             value={ratio}
             min={0.340}
             max={0.440}
-            normalMin={0.380}
-            normalMax={0.390}
             color={ratioData.color}
           />
         </div>

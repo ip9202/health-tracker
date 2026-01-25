@@ -53,7 +53,7 @@ export interface InBodyData {
 
 /**
  * 차트 및 리스트 표시용 간소화된 InBody 레코드
- * InBodyData의 필드명과 일치하도록 수정
+ * InBodyData와 타입 일관성을 맞추되, 하위 호환성 유지 (TAG-TYPE-001)
  */
 export interface InBodyRecord {
   id: string
@@ -64,16 +64,16 @@ export interface InBodyRecord {
   name?: string
   gender?: string
   age?: number
-  height?: number
+  height?: number // cm
 
   // 체성분 데이터
-  weight?: number
-  bodyFat?: number // 체지방량 (kg)
-  bodyFatPercentage?: number // 체지방률 (%)
-  muscle?: number
-  protein?: number
-  bodyWater?: number
-  skeletalMuscle?: number
+  weight?: number // kg
+  bodyFat?: number // % (체지방률, InBodyData와 동일)
+  bodyFatPercentage?: number // % (체지방률, 하위 호환성용 별칭)
+  muscle?: number // kg
+  protein?: number // kg
+  bodyWater?: number // kg
+  skeletalMuscle?: number // kg
 
   // 신체 점수
   bodyScore?: number
@@ -84,13 +84,15 @@ export interface InBodyRecord {
   bmiStatus?: string
 
   // 체중 조절
-  weightControl?: string
+  weightControl?: string // 하위 호환성용
+  weightChangeRecommendation?: string // InBodyData와 필드명 통일
 
   // 신체 유형
   bodyType?: string
 
   // 기타 지표
-  calorieNeeds?: number
+  dailyCalories?: number // InBodyData와 필드명 통일
+  calorieNeeds?: number // 하위 호환성용
 
   // OCR 메타데이터
   ocrConfidence?: number

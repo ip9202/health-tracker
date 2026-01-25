@@ -172,12 +172,12 @@ export function ChartContainer() {
                     color: '#101828',
                     fontSize: '14px',
                   }}
-                  formatter={(value: unknown, name: unknown) => {
+                  formatter={(value: unknown, name: unknown): [string, string] => {
                     const v = typeof value === 'number' ? value.toFixed(1) : '--'
                     if (name === 'Weight (kg)') return [v, 'Weight']
                     if (name === 'Muscle (kg)') return [v, 'Muscle']
                     if (name === 'Body Fat (%)') return [v, 'Body Fat %']
-                    return [v, name ?? '']
+                    return [v, String(name ?? '')]
                   }}
                 />
                 <Legend
