@@ -54,6 +54,53 @@ vi.mock('next-auth/react', () => ({
   signOut: vi.fn()
 }))
 
+// Mock Tesseract.js with PSM enum
+vi.mock('tesseract.js', () => {
+  const createWorker = vi.fn(() => Promise.resolve({
+    loadLanguage: vi.fn(() => Promise.resolve()),
+    initialize: vi.fn(() => Promise.resolve()),
+    recognize: vi.fn(() => Promise.resolve({
+      data: {
+        text: '',
+        confidence: 95,
+      }
+    })),
+    terminate: vi.fn(() => Promise.resolve()),
+  }));
+
+  // PSM enum
+  const PSM = {
+    AUTO: '3',
+    SINGLE_BLOCK: '6',
+    SPARSE_TEXT: '11',
+    RAW_LINE: '13',
+  };
+
+  return {
+    default: { createWorker },
+    createWorker,
+    PSM,
+  };
+});
+
+// Mock @google-cloud/vision
+vi.mock('@google-cloud/vision', () => {
+  const mockImageAnnotatorClient = vi.fn(() => ({
+    documentTextDetection: vi.fn(() => Promise.resolve([{
+      fullTextAnnotation: {
+        text: 'Sample text',
+        pages: [{ confidence: 0.95 }],
+      }
+    }])),
+  }));
+
+  return {
+    default: {
+      ImageAnnotatorClient: mockImageAnnotatorClient,
+    },
+  };
+});
+
 // Mock Canvas API for happy-dom
 
 // Mock Image class for testing

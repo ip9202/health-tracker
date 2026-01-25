@@ -178,7 +178,7 @@ export function calculatePercentage(value: number, range: { low: number; high: n
  * @returns 포맷팅된 문자열
  */
 export function formatMetricValue(metric: ChartMetric): string {
-  return `${metric.value}${metric.unit}`;
+  return `${metric.value.toFixed(2)}${metric.unit}`;
 }
 
 /**
@@ -189,7 +189,7 @@ export function formatMetricValue(metric: ChartMetric): string {
  * @returns 범위 설명 텍스트
  */
 export function formatRangeText(range: { low: number; high: number }, unit: string): string {
-  return `${range.low}${unit} - ${range.high}${unit}`;
+  return `${range.low.toFixed(2)}${unit} - ${range.high.toFixed(2)}${unit}`;
 }
 
 /**

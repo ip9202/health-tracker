@@ -396,9 +396,7 @@ export const InBodyExtractionSchema = z.object({
   weightControl: z.string().optional(),
 
   // 기타 지표
-  smi: z.number().positive().optional(),
   dailyCalories: z.number().positive().optional(),
-  bioimpedance: z.union([z.string(), z.record(z.number())]).optional(),
 });
 
 export type InBodyExtraction = z.infer<typeof InBodyExtractionSchema>;
@@ -478,9 +476,7 @@ export async function extractInBodyFromImage(imageBase64: string): Promise<InBod
   "bmi": 23.5,
   "bmiStatus": "정상",
   "weightControl": "+3.5kg",
-  "smi": 7.8,
-  "dailyCalories": 1850,
-  "bioimpedance": "R 500 / X 500"
+  "dailyCalories": 1850
 }
 \`\`\`
 
@@ -658,9 +654,7 @@ ${ocrText}
 - bmi: BMI 지수
 - bmiStatus: BMI 상태 (저체중, 정상, 과체중, 비만 등)
 - weightControl: 체중 조절 권장사항 (문자열 또는 숫자)
-- smi: SMI (골격근량 지수)
 - dailyCalories: 일일 권장 칼로리
-- bioimpedance: 생체임피던스 값 (문자열 또는 객체)
 
 주의사항:
 - OCR 텍스트는 노이즈가 있을 수 있으니 맥락을 고려하여 정확한 값을 추출하세요

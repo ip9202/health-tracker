@@ -2,17 +2,19 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TesseractEngine, createTesseractEngine } from '@/lib/ocr-engines/tesseract-engine';
 import { OCRError } from '@/lib/ocr-engines/types';
 
-// Tesseract.js 모킹 - 팩토리 내에서 직접 vi.fn() 사용
-vi.mock('tesseract.js', () => {
-  const mockRecognize = vi.fn();
-  const mockTerminate = vi.fn();
-  const mockWorker = {
-    recognize: mockRecognize,
-    terminate: mockTerminate,
-  };
-  const mockCreateWorker = vi.fn(() => Promise.resolve(mockWorker));
+// Tesseract.js 모킹 - vitest.setup.ts에서 정의된 mock 확장
+const mockRecognize = vi.fn();
+const mockTerminate = vi.fn();
+const mockWorker = {
+  recognize: mockRecognize,
+  terminate: mockTerminate,
+};
+const mockCreateWorker = vi.fn(() => Promise.resolve(mockWorker));
 
+vi.mock('tesseract.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('tesseract.js')>();
   return {
+    ...actual,
     createWorker: mockCreateWorker,
     __mocks__: {
       mockCreateWorker,
@@ -23,17 +25,16 @@ vi.mock('tesseract.js', () => {
 });
 
 // 모듈에서 mock 함수 가져오기
-let mockCreateWorker: any;
-let mockRecognize: any;
-let mockTerminate: any;
+let createWorkerMock: any;
+let recognizeMock: any;
+let terminateMock: any;
 
 beforeEach(async () => {
   const tesseract = await import('tesseract.js');
-  mockCreateWorker = (tesseract as any).__mocks__.mockCreateWorker;
-  mockRecognize = (tesseract as any).__mocks__.mockRecognize;
-  mockTerminate = (tesseract as any).__mocks__.mockTerminate;
+  createWorkerMock = (tesseract as any).__mocks__.mockCreateWorker;
+  recognizeMock = (tesseract as any).__mocks__.mockRecognize;
+  terminateMock = (tesseract as any).__mocks__.mockTerminate;
 });
-
 describe('TesseractEngine', () => {
   beforeEach(() => {
     vi.clearAllMocks();

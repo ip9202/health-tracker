@@ -108,11 +108,11 @@ function MetricBarItem({ metric }: { metric: ChartMetric }) {
 
         {/* 구간 라벨 */}
         <div className="flex justify-between mt-1 text-xs text-gray-500">
-          <span>{metric.range.low}{metric.unit}</span>
+          <span>{metric.range.low.toFixed(2)}{metric.unit}</span>
           <span className="text-green-600 font-medium">
-            {metric.range.low}-{metric.range.high}{metric.unit}
+            {metric.range.low.toFixed(2)}-{metric.range.high.toFixed(2)}{metric.unit}
           </span>
-          <span>{metric.range.high + (metric.range.high - metric.range.low)}{metric.unit}</span>
+          <span>{(metric.range.high + (metric.range.high - metric.range.low)).toFixed(2)}{metric.unit}</span>
         </div>
       </div>
 

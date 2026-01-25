@@ -131,6 +131,19 @@ export function parseInBodyData(ocrText: string): ParseResult {
     data.age = parseInt(ageMatch[1], 10);
   }
 
+  // 측정일: "2024.03.25", "2024-03-25", "2024년 3월 25일" 형식 추출
+  // Priority 1: "YYYY.MM.DD" 또는 "YYYY-MM-DD" 형식
+  const measuredAtMatch = text.match(/(\d{4})[.\-年](\d{1,2})[.\-月](\d{1,2})[日]?/);
+  if (measuredAtMatch) {
+    const year = parseInt(measuredAtMatch[1], 10);
+    const month = parseInt(measuredAtMatch[2], 10);
+    const day = parseInt(measuredAtMatch[3], 10);
+    // 유효한 날짜인지 확인
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2000 && year <= 2100) {
+      data.measuredAt = new Date(year, month - 1, day);
+    }
+  }
+
   // 신장: "높이:17300" (mm → cm 변환)
   const heightMatch = text.match(/(?:신장|높이|키)\s*[:\s]*(\d+\.?\d*)\s*(?:cm|m)?/);
   if (heightMatch) {

@@ -104,15 +104,7 @@ export async function POST(request: NextRequest) {
           : null,
 
         // 기타 지표
-        smi: extractedData.smi,
         calorieNeeds: extractedData.dailyCalories ? Math.round(extractedData.dailyCalories) : null,
-        bioimpedance: (() => {
-          if (!extractedData.bioimpedance) return null;
-          if (typeof extractedData.bioimpedance === 'object') {
-            return JSON.stringify(extractedData.bioimpedance);
-          }
-          return String(extractedData.bioimpedance);
-        })(),
 
         // OCR 메타데이터
         ocrConfidence: null, // 하이브리드 방식이므로 신뢰도 미측정

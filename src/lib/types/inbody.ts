@@ -42,9 +42,7 @@ export interface InBodyData {
   bodyType?: string
 
   // 기타 지표
-  smi?: number
   dailyCalories?: number
-  bioimpedance?: string // 생체임피던스
 
   // 메타데이터
   imagePath: string
@@ -70,7 +68,8 @@ export interface InBodyRecord {
 
   // 체성분 데이터
   weight?: number
-  bodyFatPercentage?: number // bodyFat -> bodyFatPercentage 로 변경
+  bodyFat?: number // 체지방량 (kg)
+  bodyFatPercentage?: number // 체지방률 (%)
   muscle?: number
   protein?: number
   bodyWater?: number
@@ -91,9 +90,7 @@ export interface InBodyRecord {
   bodyType?: string
 
   // 기타 지표
-  smi?: number
   calorieNeeds?: number
-  bioimpedance?: string
 
   // OCR 메타데이터
   ocrConfidence?: number

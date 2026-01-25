@@ -14,12 +14,13 @@ import {
 import { preprocessImage, PreprocessingOptions, calculateImageQuality } from '@/lib/image-preprocessor';
 import type { ImageQualityMetrics } from '@/lib/types/extraction';
 
-// Tesseract.js 모킹
-vi.mock('tesseract.js', () => ({
-  default: {
-    createWorker: vi.fn(),
-  },
-}));
+// Tesseract.js 모킹 - vitest.setup.ts에서 정의된 mock 사용
+vi.mock('tesseract.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('tesseract.js')>();
+  return {
+    ...actual,
+  };
+});
 
 import Tesseract from 'tesseract.js';
 

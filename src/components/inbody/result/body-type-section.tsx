@@ -178,7 +178,7 @@ export function BodyTypeSection({ bodyType, weightControl }: BodyTypeSectionProp
                   weightInfo.isGain ? 'text-blue-600' : 'text-orange-600'
                 }`}
               >
-                {weightInfo.sign}{weightInfo.value.toFixed(1)}
+                {weightInfo.sign}{weightInfo.value.toFixed(2)}
               </span>
               <span className="text-sm text-gray-600">kg</span>
             </div>

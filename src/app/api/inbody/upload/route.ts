@@ -109,7 +109,7 @@ async function saveInBodyRecord(
     const inbodyRecord = await prisma.inBodyRecord.create({
       data: {
         userId,
-        measuredAt: new Date(),
+        measuredAt: parseResult.data.measuredAt || new Date(),
         // 개인정보
         name: parseResult.data.name,
         gender: parseResult.data.gender,
@@ -132,13 +132,8 @@ async function saveInBodyRecord(
         weightControl: parseResult.data.weightControl,
         // 신체 유형
         bodyType: parseResult.data.bodyType,
-        // 생체 임피던스
-        bioimpedance: parseResult.data.bioimpedance,
         // 기타 지표
-        smi: parseResult.data.smi,
         calorieNeeds: parseResult.data.calorieNeeds,
-        // 부위별 분석
-        regionalAnalysis: parseResult.data.regionalAnalysis,
         // OCR 메타데이터
         ocrConfidence: ocrConfidence,
       },

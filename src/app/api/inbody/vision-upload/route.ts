@@ -98,15 +98,7 @@ export async function POST(request: NextRequest) {
           : null,
 
         // 기타 지표
-        smi: extractedData.smi,
         calorieNeeds: extractedData.dailyCalories ? Math.round(extractedData.dailyCalories) : null,
-        bioimpedance: (() => {
-          if (!extractedData.bioimpedance) return null;
-          if (typeof extractedData.bioimpedance === 'object') {
-            return JSON.stringify(extractedData.bioimpedance);
-          }
-          return String(extractedData.bioimpedance);
-        })(),
 
         // OCR 메타데이터 (Vision 사용 표시)
         ocrConfidence: 100, // Vision은 높은 신뢰도

@@ -11,8 +11,9 @@ import { UploadSection } from './upload/upload-section'
 import { ChartContainer } from './charts/chart-container'
 import { HistoryList } from './history/history-list'
 import { InBodyResultCard } from './result/inbody-result-card'
+import { InBodyResultsChartSimple } from '@/components/InBodyResultsChart'
 import { fetchInBodyHistory } from '@/lib/api/inbody-api'
-import type { InBodyData } from '@/lib/types/inbody'
+import type { InBodyData, InBodyRecord } from '@/lib/types/inbody'
 
 export function InBodyDashboard() {
   const [latestData, setLatestData] = useState<InBodyData | null>(null)
@@ -31,8 +32,15 @@ export function InBodyDashboard() {
         setLatestData(record as unknown as InBodyData)
       }
     } catch (err) {
-      console.error('Failed to load latest InBody data:', err)
-      setError('데이터를 불러오는데 실패했습니다.')
+      // 401 에러(인증되지 않음)는 조용히 처리 - 로그인하지 않은 사용자용
+      const message = err instanceof Error ? err.message : String(err)
+      if (message.includes('401')) {
+        console.log('인증되지 않은 사용자 - InBody 기록을 표시하지 않음')
+        setLatestData(null)
+      } else {
+        console.error('Failed to load latest InBody data:', err)
+        setError('데이터를 불러오는데 실패했습니다.')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -59,16 +67,21 @@ export function InBodyDashboard() {
       </div>
 
       {/* 대시보드 컨텐츠 영역 */}
-      <div className="grid gap-0 md:grid-cols-[736px_1fr] auto-rows-max">
-        {/* InBody 결과 카드 섹션 - 전체 너비 */}
-        <div className="md:col-span-2 px-4 pb-4">
-          <InBodyResultCard data={latestData} isLoading={isLoading} />
-        </div>
-
-        {/* 업로드 섹션 */}
+      <div className="flex flex-col gap-4 px-4">
+        {/* 업로드 섹션 - 상단 전체 너비 */}
         <div className="bg-white border border-[#e5e7eb] rounded-[14px] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6">
           <UploadSection onUploadSuccess={reloadLatestData} />
         </div>
+
+        {/* InBody 결과 카드 - 전체 너비 */}
+        <InBodyResultCard data={latestData} isLoading={isLoading} />
+
+        {/* InBody 체성분 시각화 막대 그래프 - 전체 너비 */}
+        {latestData && (
+          <div className="bg-white border border-[#e5e7eb] rounded-[14px] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6">
+            <InBodyResultsChartSimple data={latestData as unknown as InBodyRecord} />
+          </div>
+        )}
 
         {/* 차트 섹션 */}
         <div className="bg-white border border-[#e5e7eb] rounded-[14px] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-6">
@@ -76,7 +89,7 @@ export function InBodyDashboard() {
         </div>
 
         {/* 기록 관리 섹션 - 전체 너비 */}
-        <div className="md:col-span-2 bg-white border border-[#e5e7eb] rounded-[14px] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-6">
+        <div className="bg-white border border-[#e5e7eb] rounded-[14px] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-6">
           <HistoryList />
         </div>
       </div>

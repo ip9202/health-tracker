@@ -227,3 +227,6 @@ dist-ssr/
 
 # Serena MCP
 .serena/
+.env
+.claude/plans/
+google-credentials.json

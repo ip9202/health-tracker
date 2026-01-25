@@ -97,6 +97,11 @@ export async function fetchInBodyHistory(options: {
  * @param id 삭제할 기록 ID
  * @returns 삭제 결과
  */
+/**
+ * InBody 기록 삭제
+ * @param id 삭제할 기록 ID
+ * @returns 삭제 결과
+ */
 export async function deleteInBodyRecord(id: string): Promise<{ success: boolean }> {
   const response = await fetch(`/api/inbody/${id}`, {
     method: 'DELETE',
@@ -104,6 +109,45 @@ export async function deleteInBodyRecord(id: string): Promise<{ success: boolean
 
   if (!response.ok) {
     throw new Error(`Failed to delete record: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+/**
+ * InBody 체성분 추이 데이터 조회
+ * @param options 날짜 범위 및 메트릭 옵션
+ * @returns 체성분 추이 데이터
+ */
+export async function fetchInBodyTrend(options: {
+  from?: Date
+  to?: Date
+  metrics?: Array<'weight' | 'bodyFatPercentage' | 'skeletalMuscle'>
+} = {}): Promise<{
+  success: boolean
+  data: {
+    trend: Array<{
+      date: string
+      weight?: number | null
+      bodyFatPercentage?: number | null
+      skeletalMuscle?: number | null
+    }>
+    metrics: string[]
+    count: number
+  }
+}> {
+  const params = new URLSearchParams()
+
+  if (options.from) params.append('from', options.from.toISOString())
+  if (options.to) params.append('to', options.to.toISOString())
+  if (options.metrics) params.append('metrics', options.metrics.join(','))
+
+  const url = `/api/inbody/trend${params.toString() ? `?${params.toString()}` : ''}`
+
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch trend: ${response.status}`)
   }
 
   return response.json()

@@ -2,15 +2,18 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GoogleVisionEngine, createGoogleVisionEngine } from '@/lib/ocr-engines/google-vision-engine';
 import { OCRError } from '@/lib/ocr-engines/types';
 
-// @google-cloud/vision 모킹 - 팩토리 내에서 직접 vi.fn() 사용
-vi.mock('@google-cloud/vision', () => {
-  const mockDocumentTextDetection = vi.fn();
-  const mockImageAnnotatorClient = vi.fn(() => ({
-    documentTextDetection: mockDocumentTextDetection,
-  }));
+// @google-cloud/vision 모킹 - vitest.setup.ts에서 정의된 mock 확장
+const mockDocumentTextDetection = vi.fn();
+const mockImageAnnotatorClient = vi.fn(() => ({
+  documentTextDetection: mockDocumentTextDetection,
+}));
 
+vi.mock('@google-cloud/vision', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@google-cloud/vision')>();
   return {
+    ...actual,
     default: {
+      ...actual.default,
       ImageAnnotatorClient: mockImageAnnotatorClient,
     },
     __mocks__: {
@@ -21,16 +24,15 @@ vi.mock('@google-cloud/vision', () => {
 });
 
 // 모듈에서 mock 함수 가져오기 (비동기로 처리)
-let mockDocumentTextDetection: any;
-let mockImageAnnotatorClient: any;
+let documentTextDetectionMock: any;
+let imageAnnotatorClientMock: any;
 
 // 최상위 beforeEach로 mock 초기화
 beforeEach(async () => {
   const vision = await import('@google-cloud/vision');
-  mockDocumentTextDetection = (vision as any).__mocks__.mockDocumentTextDetection;
-  mockImageAnnotatorClient = (vision as any).__mocks__.mockImageAnnotatorClient;
+  documentTextDetectionMock = (vision as any).__mocks__.mockDocumentTextDetection;
+  imageAnnotatorClientMock = (vision as any).__mocks__.mockImageAnnotatorClient;
 });
-
 describe('GoogleVisionEngine', () => {
   let mockClient: any;
 

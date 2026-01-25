@@ -179,7 +179,7 @@ export function BodyCompositionSection({
     // 체중
     rows.push({
       label: '체중',
-      value: `${data.weight}kg`,
+      value: `${data.weight.toFixed(2)}kg`,
       standard: standards.weight.label,
       status: data.weight >= standards.weight.min && data.weight <= standards.weight.max ? 'normal' : 'abnormal',
     })
@@ -187,7 +187,7 @@ export function BodyCompositionSection({
     // 체지방률
     rows.push({
       label: '체지방률',
-      value: `${data.bodyFatPercentage}%`,
+      value: `${data.bodyFatPercentage.toFixed(2)}%`,
       standard: standards.bodyFatPercentage.label,
       status:
         data.bodyFatPercentage >= standards.bodyFatPercentage.min &&
@@ -199,7 +199,7 @@ export function BodyCompositionSection({
     // 근육량
     rows.push({
       label: '근육량',
-      value: `${data.muscle}kg`,
+      value: `${data.muscle.toFixed(2)}kg`,
       standard: standards.muscle.label,
       status:
         data.muscle >= standards.muscle.min && data.muscle <= standards.muscle.max ? 'normal' : 'abnormal',
@@ -208,7 +208,7 @@ export function BodyCompositionSection({
     // 골격근량
     rows.push({
       label: '골격근량',
-      value: `${data.skeletalMuscle}kg`,
+      value: `${data.skeletalMuscle.toFixed(2)}kg`,
       standard: standards.skeletalMuscle.label,
       status:
         data.skeletalMuscle >= standards.skeletalMuscle.min &&
@@ -220,7 +220,7 @@ export function BodyCompositionSection({
     // 단백질
     rows.push({
       label: '단백질',
-      value: `${data.protein}kg`,
+      value: `${data.protein.toFixed(2)}kg`,
       standard: standards.protein.label,
       status:
         data.protein >= standards.protein.min && data.protein <= standards.protein.max ? 'normal' : 'abnormal',
@@ -229,7 +229,7 @@ export function BodyCompositionSection({
     // 체수분
     rows.push({
       label: '체수분',
-      value: `${data.bodyWater}kg`,
+      value: `${data.bodyWater.toFixed(2)}kg`,
       standard: standards.bodyWater.label,
       status:
         data.bodyWater >= standards.bodyWater.min && data.bodyWater <= standards.bodyWater.max ? 'normal' : 'abnormal',

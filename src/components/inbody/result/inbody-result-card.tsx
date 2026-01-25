@@ -14,7 +14,6 @@ import { BodyScoreSection } from './body-score-section'
 import { BodyCompositionSection } from './body-composition-section'
 import { ObesityAnalysisSection } from './obesity-analysis-section'
 import { BodyTypeSection } from './body-type-section'
-import { SegmentalAnalysisSection } from './segmental-analysis-section'
 import { AdditionalInfoSection } from './additional-info-section'
 
 interface InBodyResultCardProps {
@@ -104,52 +103,58 @@ export function InBodyResultCard({ data, isLoading }: InBodyResultCardProps) {
 
   return (
     <Card className="w-full bg-white border border-gray-200 shadow-sm">
-      <CardContent className="p-6 space-y-6">
-        {/* 헤더 섹션 */}
-        <HeaderSection
-          name={data.name || '미입력'}
-          measuredAt={data.measuredAt}
-        />
+      <CardContent className="p-6">
+        {/* 상단: 2컬럼 레이아웃 - 헤더 + 신체 점수 + 체성분 + 비만 판정 + 신체 유형 */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* 왼쪽 컬럼 */}
+          <div className="space-y-6">
+            {/* 헤더 섹션 */}
+            <HeaderSection
+              name={data.name || '미입력'}
+              measuredAt={data.measuredAt}
+            />
 
-        {/* 신체 점수 섹션 */}
-        {data.bodyScore !== undefined && (
-          <BodyScoreSection
-            bodyScore={data.bodyScore}
-            scoreDescription={data.scoreDescription}
-          />
-        )}
+            {/* 신체 점수 섹션 */}
+            {data.bodyScore !== undefined && (
+              <BodyScoreSection
+                bodyScore={data.bodyScore}
+                scoreDescription={data.scoreDescription}
+              />
+            )}
 
-        {/* 분할 분석 섹션 (Figma 디자인) */}
-        <SegmentalAnalysisSection />
+            {/* 체성분 분석 섹션 */}
+            <BodyCompositionSection
+              weight={data.weight}
+              bodyFatPercentage={data.bodyFat}
+              muscle={data.muscle}
+              skeletalMuscle={data.skeletalMuscle}
+              protein={data.protein}
+              bodyWater={data.bodyWater}
+            />
+          </div>
 
-        {/* 체성분 분석 섹션 */}
-        <BodyCompositionSection
-          weight={data.weight}
-          bodyFatPercentage={data.bodyFat}
-          muscle={data.muscle}
-          skeletalMuscle={data.skeletalMuscle}
-          protein={data.protein}
-          bodyWater={data.bodyWater}
-        />
+          {/* 오른쪽 컬럼 */}
+          <div className="space-y-6">
+            {/* 비만 판정 섹션 */}
+            {(data.bmi !== undefined || data.bmiStatus) && (
+              <ObesityAnalysisSection
+                bmi={data.bmi}
+                bmiStatus={data.bmiStatus}
+              />
+            )}
 
-        {/* 비만 판정 섹션 */}
-        {(data.bmi !== undefined || data.bmiStatus) && (
-          <ObesityAnalysisSection
-            bmi={data.bmi}
-            bmiStatus={data.bmiStatus}
-          />
-        )}
+            {/* 신체 유형 섹션 */}
+            {(data.bodyType || data.weightChangeRecommendation) && (
+              <BodyTypeSection
+                bodyType={data.bodyType}
+                weightControl={data.weightChangeRecommendation}
+              />
+            )}
 
-        {/* 신체 유형 섹션 */}
-        {(data.bodyType || data.weightChangeRecommendation) && (
-          <BodyTypeSection
-            bodyType={data.bodyType}
-            weightControl={data.weightChangeRecommendation}
-          />
-        )}
-
-        {/* 추가 정보 섹션 (Figma 디자인) */}
-        <AdditionalInfoSection />
+            {/* 추가 정보 섹션 (Figma 디자인) */}
+            <AdditionalInfoSection />
+          </div>
+        </div>
 
       </CardContent>
     </Card>
